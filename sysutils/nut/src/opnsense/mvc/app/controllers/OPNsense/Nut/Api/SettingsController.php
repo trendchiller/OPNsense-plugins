@@ -1,4 +1,5 @@
 <?php
+
 /**
  *    Copyright (C) 2017 Fabian Franz
  *
@@ -29,10 +30,10 @@
 
 namespace OPNsense\Nut\Api;
 
-use \OPNsense\Base\ApiMutableModelControllerBase;
+use OPNsense\Base\ApiMutableModelControllerBase;
 
 class SettingsController extends ApiMutableModelControllerBase
 {
-    static protected $internalModelClass = '\OPNsense\Nut\Nut';
-    static protected $internalModelName = 'nut';
+    protected static $internalModelClass = '\OPNsense\Nut\Nut';
+    protected static $internalModelName = 'nut';
 }

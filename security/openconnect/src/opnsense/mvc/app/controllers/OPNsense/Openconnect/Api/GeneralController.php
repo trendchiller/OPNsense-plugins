@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (C) 2018 Michael Muenz
+ * Copyright (C) 2018 Michael Muenz <m.muenz@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,6 +32,6 @@ use OPNsense\Base\ApiMutableModelControllerBase;
 
 class GeneralController extends ApiMutableModelControllerBase
 {
-    static protected $internalModelClass = '\OPNsense\Openconnect\General';
-    static protected $internalModelName = 'general';
+    protected static $internalModelClass = '\OPNsense\Openconnect\General';
+    protected static $internalModelName = 'general';
 }

@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (C) 2017 Michael Muenz
+ * Copyright (C) 2017 Michael Muenz <m.muenz@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,6 +32,6 @@ use OPNsense\Base\ApiMutableModelControllerBase;
 
 class AntivirusController extends ApiMutableModelControllerBase
 {
-    static protected $internalModelClass = '\OPNsense\CICAP\Antivirus';
-    static protected $internalModelName = 'antivirus';
+    protected static $internalModelClass = '\OPNsense\CICAP\Antivirus';
+    protected static $internalModelName = 'antivirus';
 }

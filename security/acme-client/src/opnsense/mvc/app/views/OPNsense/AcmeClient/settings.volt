@@ -1,6 +1,6 @@
 {#
 
-Copyright (C) 2017 Frank Wall
+Copyright (C) 2017-2019 Frank Wall
 OPNsense® is Copyright © 2014-2015 by Deciso B.V.
 All rights reserved.
 
@@ -184,6 +184,42 @@ POSSIBILITY OF SUCH DAMAGE.
             });
         });
 
+        // Reset certificate data (aka wipe everything)
+        $("#resetAct").click(function(){
+
+            // set progress animation
+            $('[id*="resetAct_progress"]').each(function(){
+                $(this).addClass("fa fa-spinner fa-pulse");
+            });
+
+            BootstrapDialog.show({
+                type: BootstrapDialog.TYPE_DANGER,
+                title: "{{ lang._('Wipe all certificate and account data') }}",
+                message: "{{ lang._('This will remove ALL certificates, private keys, CSRs from acme client and reset all certificate and account states. However, existing certificates will remain in OPNsense trust storage. The acme client will automatically regenerate everything on its next scheduled run. This is most useful when importing a config backup to a new firewall. Continue?') }}",
+                buttons: [{
+                    label: '{{ lang._('Continue') }}',
+                    cssClass: 'btn-primary',
+                    action: function(dlg){
+                        ajaxCall(url="/api/acmeclient/service/reset", sendData={}, callback=function(data,status) {
+                        });
+
+                        dlg.close();
+                    }
+                }, {
+                    icon: 'fa fa-trash-o',
+                    label: '{{ lang._('Abort') }}',
+                    action: function(dlg){
+                        dlg.close();
+                    }
+                }]
+            });
+
+            // when done, disable progress animation
+            $('[id*="resetAct_progress"]').each(function(){
+                $(this).removeClass("fa fa-spinner fa-pulse");
+            });
+
+        });
     });
 
 </script>
@@ -201,10 +237,11 @@ POSSIBILITY OF SUCH DAMAGE.
         <hr/>
         <button class="btn btn-primary" id="reconfigureAct" type="button"><b>{{ lang._('Apply') }}</b><i id="reconfigureAct_progress" class=""></i></button>
         <button class="btn btn-primary" id="configtestAct" type="button"><b>{{ lang._('Test Config') }}</b><i id="configtestAct_progress" class=""></i></button>
+        <button class="btn btn-primary" id="resetAct" type="button"><b>{{ lang._('Reset acme client') }}</b><i id="resetAct_progress" class=""></i></button>
         <br/>
     </div>
     <div class="col-md-12">
-        <b>{{ lang._("Please read the official %sLet's Encrypt documentation%s before using this plugin. Otherwise you will easily hit its %srate limits%s and thus all your attempts to issue a certificate will fail.") | format('<a href="https://letsencrypt.org/how-it-works/">', '</a>', '<a href="https://letsencrypt.org/docs/rate-limits/">', '</a>') }}</b>{{ lang._("Please use Let's Encrypt's %sstaging servers%s when using this plugin for the first time or while testing a new validation method. You will have to reissue your certificates when switching from staging to production servers to get valid certificates.") | format('<a href="https://letsencrypt.org/docs/staging-environment/">', '</a>') }}
+        <b>{{ lang._("Please read the official %sLet's Encrypt documentation%s before using this plugin. Otherwise you will easily hit its %srate limits%s and thus all your attempts to issue a certificate will fail.") | format('<a href="https://letsencrypt.org/how-it-works/">', '</a>', '<a href="https://letsencrypt.org/docs/rate-limits/">', '</a>') }}</b>{{ lang._("Please use Let's Encrypt's %sstaging servers%s when using this plugin for the first time or while testing a new challenge type. You will have to reissue your certificates when switching from staging to production servers to get valid certificates.") | format('<a href="https://letsencrypt.org/docs/staging-environment/">', '</a>') }}
         <br/>
         {{ lang._('Please use the %sissue tracker%s to report bugs or request new features.') | format('<a href="https://github.com/opnsense/plugins/issues">', '</a>') }}
         <br/>

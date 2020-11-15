@@ -9,7 +9,7 @@
         <id>user.username</id>
         <label>Username</label>
         <type>text</type>
-        <help>Set the unique username for the user. Allowed characters are 0-9, a-z, A-Z, and ._-</help>
+        <help>Set the unique username for the user. Allowed characters are 0-9, a-z, A-Z, and ._-@/</help>
     </field>
     <field>
         <id>user.password</id>
@@ -54,6 +54,20 @@
         <label>VLAN ID</label>
         <type>text</type>
         <help>VLAN ID the user receives, e.g. for 802.1X. Leave empty if you don't know what it is.</help>
+    </field>
+    <field>
+        <id>user.logintime</id>
+        <label>Login-Time</label>
+        <type>text</type>
+        <advanced>true</advanced>
+        <help>With this option you can set a time frame how long the user is allowed to be logged in.</help>
+    </field>
+    <field>
+        <id>user.simuse</id>
+        <label>Simultaneous-Use</label>
+        <type>text</type>
+        <advanced>true</advanced>
+        <help>Set how many times one account is allowed to login at the same time.</help>
     </field>
     <field>
         <id>user.wispr_bw_min_up</id>
@@ -108,5 +122,19 @@
         <label>Max Daily Session</label>
         <type>text</type>
         <help>Set the maximum session limit in seconds. This can be used by the Captive Portal.</help>
+    </field>
+    <field>
+        <id>user.servicetype</id>
+        <label>Service Type</label>
+        <type>select_multiple</type>
+        <advanced>true</advanced>
+        <help>Set the Service-Type attributes for this user.</help>
+    </field>
+    <field>
+        <id>user.linkedAVPair</id>
+        <label>AVPair</label>
+        <type>select_multiple</type>
+        <allownew>true</allownew>
+        <help>Select the configured AVPairs for this user.</help>
     </field>
 </form>

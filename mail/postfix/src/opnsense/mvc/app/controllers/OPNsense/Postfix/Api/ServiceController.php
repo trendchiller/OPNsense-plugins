@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (C) 2017 Michael Muenz
+ * Copyright (C) 2017 Michael Muenz <m.muenz@gmail.com>
  * Copyright (C) 2015-2017 Deciso B.V.
  * All rights reserved.
  *
@@ -39,10 +39,10 @@ use OPNsense\Postfix\General;
  */
 class ServiceController extends ApiMutableServiceControllerBase
 {
-    static protected $internalServiceClass = '\OPNsense\Postfix\General';
-    static protected $internalServiceTemplate = 'OPNsense/Postfix';
-    static protected $internalServiceEnabled = 'enabled';
-    static protected $internalServiceName = 'postfix';
+    protected static $internalServiceClass = '\OPNsense\Postfix\General';
+    protected static $internalServiceTemplate = 'OPNsense/Postfix';
+    protected static $internalServiceEnabled = 'enabled';
+    protected static $internalServiceName = 'postfix';
 
     /**
      * check rspamd

@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (C) 2017 Michael Muenz
+ * Copyright (C) 2017 Michael Muenz <m.muenz@gmail.com>
  * Copyright (C) 2018 Fabian Franz
  * All rights reserved.
  *
@@ -29,12 +29,12 @@
 
 namespace OPNsense\Postfix\Api;
 
-use \OPNsense\Base\ApiMutableModelControllerBase;
+use OPNsense\Base\ApiMutableModelControllerBase;
 
 class DomainController extends ApiMutableModelControllerBase
 {
-    static protected $internalModelName = 'domain';
-    static protected $internalModelClass = '\OPNsense\Postfix\Domain';
+    protected static $internalModelName = 'domain';
+    protected static $internalModelClass = '\OPNsense\Postfix\Domain';
 
     public function searchDomainAction()
     {

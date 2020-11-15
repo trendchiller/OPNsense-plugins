@@ -30,6 +30,18 @@
         <help>The 'Listen IPs' parameter specifies the IP address to listen to. Default is to listen on all interfaces.</help>
     </field>
     <field>
+        <id>general.inet_port</id>
+        <label>Listen Port</label>
+        <type>text</type>
+        <help>Port to listen on.</help>
+    </field>
+    <field>
+        <id>general.ip_version</id>
+        <label>IP Version</label>
+        <type>dropdown</type>
+        <help>Choose which IP versions are allowed, defaults to all.</help>
+    </field>
+    <field>
         <id>general.bind_address</id>
         <label>Bind SMTP Client Address</label>
         <type>text</type>
@@ -64,6 +76,14 @@
         <help>Set the max size for messages to accept, default is 501200000 Byte which is 50MB. Values must be entered in Bytes.</help>
     </field>
     <field>
+        <id>general.masquerade_domains</id>
+        <label>Masquerade Domains</label>
+        <style>tokenize</style>
+        <type>select_multiple</type>
+        <allownew>true</allownew>
+        <help>Masquerade internal domains to the outside. When you set example.com, the domain host.internal.example.com will be rewritten to exmaple.com when mail leaves the system.</help>
+    </field>
+    <field>
         <id>general.disable_ssl</id>
         <label>Allow TLS Only</label>
         <type>checkbox</type>
@@ -74,6 +94,12 @@
         <label>Disable Weak Ciphers And Algorithms</label>
         <type>checkbox</type>
         <help>This will disable known weak ciphers like DES, RC4 or MD5.</help>
+    </field>
+    <field>
+        <id>general.tlswrappermode</id>
+        <label>TLS Wrapper Mode</label>
+        <type>checkbox</type>
+        <help>If enabled it allows you to use SMTPS.</help>
     </field>
     <field>
         <id>general.certificate</id>
@@ -125,6 +151,36 @@
         <help>If you enable this, every entry in Recipients will be checked against. When there is no match mail will be rejected. Be aware that it does not matter if the action is "OK" or "REJECT". This setup allows you to run postfix in front of an internal system and already rejecting unsolicited mail at the border.</help>
     </field>
     <field>
+        <id>general.extensive_helo_restrictions</id>
+        <label>Advanced HELO Restrictions</label>
+        <type>checkbox</type>
+    </field>
+    <field>
+        <id>general.extensive_sender_restrictions</id>
+        <label>Advanced Sender Restrictions</label>
+        <type>checkbox</type>
+    </field>
+    <field>
+        <id>general.reject_unknown_client_hostname</id>
+        <label>Reject Unkown Client Hostname</label>
+        <type>checkbox</type>
+    </field>
+    <field>
+        <id>general.reject_non_fqdn_helo_hostname</id>
+        <label>Reject Non-FQDN HELO Hostname</label>
+        <type>checkbox</type>
+    </field>
+    <field>
+        <id>general.reject_invalid_helo_hostname</id>
+        <label>Reject Invalid HELO Hostname</label>
+        <type>checkbox</type>
+    </field>
+     <field>
+        <id>general.reject_unknown_helo_hostname</id>
+        <label>Reject Unkown HELO Hostname</label>
+        <type>checkbox</type>
+    </field>
+    <field>
         <id>general.reject_unauth_pipelining</id>
         <label>Reject Unauthenticated Pipelining</label>
         <type>checkbox</type>
@@ -156,6 +212,7 @@
         <id>general.permit_sasl_authenticated</id>
         <label>Permit SASL Authenticated</label>
         <type>checkbox</type>
+        <help>Allow SASL authenticated senders to relay. Will also enable smtpd_sasl_auth.</help>
     </field>
     <field>
         <id>general.permit_tls_clientcerts</id>

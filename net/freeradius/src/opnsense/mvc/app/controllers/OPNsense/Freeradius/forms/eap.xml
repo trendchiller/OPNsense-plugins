@@ -7,15 +7,15 @@
     </field>
     <field>
         <id>eap.enable_client_cert</id>
-        <label>Validate Certificates</label>
+        <label>Use own certificates</label>
         <type>checkbox</type>
-        <help>This will activate certificate based authentication (EAP-TLS) and validation (EAP-TTLS). Please choose CA and Certificate below and do not forget to roll out certificates to the clients.</help>
+        <help>This will activate certificate based authentication (EAP-TLS) and validation (EAP-TTLS). Please choose CA and Certificate below and do not forget to roll out certificates to the clients. If you do not enable this, default installation certificate will be used.</help>
     </field>
     <field>
         <id>eap.ca</id>
         <label>Root Certificate</label>
         <type>dropdown</type>
-        <help>Choose the Root CA.</help>
+        <help>Choose the Root CA. This CA will be trusted to issue client certificates for authentication.</help>
     </field>
     <field>
         <id>eap.certificate</id>
@@ -28,5 +28,11 @@
         <label>CRL</label>
         <type>dropdown</type>
         <help>This enables CRL checking, please restart this service with every change to the CRL.</help>
+    </field>
+    <field>
+        <id>eap.check_tls_names</id>
+        <label>Check TLS Common-Name</label>
+        <type>checkbox</type>
+        <help>Checks that the username given by the user matches the Common-Name of the certificate.</help>
     </field>
 </form>

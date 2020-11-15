@@ -20,20 +20,35 @@
     <field>
         <id>server.pubkey</id>
         <label>Public Key</label>
-        <type>info</type>
+        <type>text</type>
         <help>Public key of this instance. After saving you will see here your public key.</help>
     </field>
     <field>
         <id>server.privkey</id>
         <label>Private Key</label>
-        <type>info</type>
-        <help>Private key of this instance. After saving you will see here your public key, please keep it safe.</help>
+        <type>text</type>
+        <help>Private key of this instance. After saving you will see here your private key, please keep it safe.</help>
     </field>
     <field>
         <id>server.port</id>
         <label>Listen Port</label>
         <type>text</type>
         <help>Set port for this instance to listen on.</help>
+    </field>
+    <field>
+        <id>server.mtu</id>
+        <label>MTU</label>
+        <type>text</type>
+        <advanced>true</advanced>
+        <help>Set the interface MTU for this interface. Leaving empty uses the MTU from main interface which is fine for most setups.</help>
+    </field>
+    <field>
+        <id>server.dns</id>
+        <label>DNS Server</label>
+        <type>select_multiple</type>
+        <style>tokenize</style>
+        <allownew>true</allownew>
+        <help>Set the interface specific DNS server.</help>
     </field>
     <field>
         <id>server.tunneladdress</id>
@@ -49,5 +64,18 @@
         <type>select_multiple</type>
         <allownew>true</allownew>
         <help>List of peers for this server.</help>
+    </field>
+    <field>
+        <id>server.disableroutes</id>
+        <label>Disable Routes</label>
+        <type>checkbox</type>
+        <help>This will prevent installing routes. Usually you only enable this to do own routing decisions via a local gateway and gateway rules.</help>
+    </field>
+    <field>
+        <id>server.gateway</id>
+        <label>Gateway</label>
+        <type>text</type>
+        <advanced>true</advanced>
+        <help>Set the gateway IP here when using Disable Routes feature. You also have to add this as a gateway in OPNsense.</help>
     </field>
 </form>

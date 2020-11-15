@@ -1,4 +1,5 @@
 <?php
+
 /**
  *    Copyright (C) 2018 David Harrigan
  *    Copyright (C) 2017 Deciso B.V.
@@ -27,6 +28,7 @@
  *    POSSIBILITY OF SUCH DAMAGE.
  *
  */
+
 namespace OPNsense\NodeExporter;
 
 use OPNsense\Base\BaseModel;

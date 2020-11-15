@@ -1,7 +1,8 @@
 <?php
+
 /*
     Copyright (C) 2017 Fabian Franz
-    Copyright (C) 2017 Michael Muenz
+    Copyright (C) 2017 Michael Muenz <m.muenz@gmail.com>
     All rights reserved.
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions are met:
@@ -42,9 +43,5 @@ class DiagnosticsController extends \OPNsense\Base\IndexController
     public function generalAction()
     {
         $this->view->pick('OPNsense/Quagga/diagnosticsgeneral');
-    }
-    public function logAction()
-    {
-        $this->view->pick('OPNsense/Quagga/log');
     }
 }

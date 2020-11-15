@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (C) 2017 Michael Muenz
+ * Copyright (C) 2017 Michael Muenz <m.muenz@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,10 +37,10 @@ use OPNsense\Core\Backend;
  */
 class ServiceController extends ApiMutableServiceControllerBase
 {
-    static protected $internalServiceClass = '\OPNsense\ClamAV\General';
-    static protected $internalServiceTemplate = 'OPNsense/ClamAV';
-    static protected $internalServiceEnabled = 'enabled';
-    static protected $internalServiceName = 'clamav';
+    protected static $internalServiceClass = '\OPNsense\ClamAV\General';
+    protected static $internalServiceTemplate = 'OPNsense/ClamAV';
+    protected static $internalServiceEnabled = 'enabled';
+    protected static $internalServiceName = 'clamav';
 
     /**
      * load the initial signatures

@@ -18,7 +18,7 @@
         <help>Whether to report total system CPU stats or not.</help>
     </field>
     <field>
-        <id>input.cpu_collect_cpu_time</id>
+        <id>input.collect_cpu_time</id>
         <label>Collect CPU Time</label>
         <type>checkbox</type>
         <help>If true, collect raw CPU time metrics.</help>
@@ -38,7 +38,9 @@
     <field>
         <id>input.disk_ignore_fs</id>
         <label>Disk Ignore FS</label>
-        <type>text</type>
+        <style>tokenize</style>
+        <type>select_multiple</type>
+        <allownew>true</allownew>
         <help>Ignore some mountpoints by filesystem type. For example (dev)tmpfs (usually present on /run, /var/run, /dev/shm or /dev).</help>
     </field>
     <field>
@@ -78,6 +80,12 @@
         <help>Read network interface metrics.</help>
     </field>
     <field>
+        <id>input.pf</id>
+        <label>PF</label>
+        <type>checkbox</type>
+        <help>Read PF values via pfctl.</help>
+    </field>
+    <field>
         <id>input.ping</id>
         <label>Ping</label>
         <type>checkbox</type>
@@ -90,5 +98,29 @@
         <style>tokenize</style>
         <allownew>true</allownew>
         <help>Set the Hosts to ping in a CSV list.</help>
+    </field>
+    <field>
+        <id>input.haproxy</id>
+        <label>HAProxy</label>
+        <type>checkbox</type>
+        <help>Enable the collection of HAProxy statistics.</help>
+    </field>
+    <field>
+        <id>input.zfs</id>
+        <label>ZFS</label>
+        <type>checkbox</type>
+        <help>Enable the collection of ZFS statistics.</help>
+    </field>
+    <field>
+        <id>input.ntpq</id>
+        <label>NTPQ</label>
+        <type>checkbox</type>
+        <help>Enable the collection of NTP query metrics.</help>
+    </field>
+    <field>
+        <id>input.ntpq_dns_lookup</id>
+        <label>NTPQ DNS Lookup</label>
+        <type>checkbox</type>
+        <help>Can increase metric gather times.</help>
     </field>
 </form>

@@ -1,4 +1,4 @@
-# Copyright (c) 2015-2018 Franco Fichtner <franco@opnsense.org>
+# Copyright (c) 2015-2020 Franco Fichtner <franco@opnsense.org>
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -25,12 +25,7 @@
 
 all: check
 
-LOCALBASE?=		/usr/local
-PKG!=			which pkg || echo true
-ARCH!=			uname -p
-
-PLUGIN_ARCH?=		${ARCH}
-PLUGIN_PHP?=		71
+.include "defaults.mk"
 
 PLUGIN_DESC=		pkg-descr
 PLUGIN_SCRIPTS=		+PRE_INSTALL +POST_INSTALL \
@@ -52,7 +47,11 @@ check:
 .  endif
 .endfor
 
+.if defined(_PLUGIN_DEVEL)
+PLUGIN_DEVEL?:=		${_PLUGIN_DEVEL}
+.else
 PLUGIN_DEVEL?=		yes
+.endif
 
 PLUGIN_PREFIX?=		os-
 PLUGIN_SUFFIX?=		-devel
@@ -179,11 +178,17 @@ install: check
 	@(cd ${.CURDIR}/src; find * -type f) | while read FILE; do \
 		tar -C ${.CURDIR}/src -cpf - $${FILE} | \
 		    tar -C ${DESTDIR}${LOCALBASE} -xpf -; \
+		if [ "$${FILE%%.in}" != "$${FILE}" ]; then \
+			sed -i '' ${SED_REPLACE} "${DESTDIR}${LOCALBASE}/$${FILE}"; \
+			mv "${DESTDIR}${LOCALBASE}/$${FILE}" "${DESTDIR}${LOCALBASE}/$${FILE%%.in}"; \
+		fi; \
 	done
 	@echo "${PLUGIN_PKGVERSION}" > "${DESTDIR}${LOCALBASE}/opnsense/version/${PLUGIN_NAME}"
 
 plist: check
 	@(cd ${.CURDIR}/src; find * -type f) | while read FILE; do \
+		if [ -f "$${FILE}.in" ]; then continue; fi; \
+		FILE="$${FILE%%.in}"; \
 		echo ${LOCALBASE}/$${FILE}; \
 	done
 	@echo "${LOCALBASE}/opnsense/version/${PLUGIN_NAME}"
@@ -226,8 +231,13 @@ package: check
 .for DEP in ${PLUGIN_DEPENDS}
 	@if ! ${PKG} info ${DEP} > /dev/null; then ${PKG} install -yA ${DEP}; fi
 .endfor
-	@${MAKE} DESTDIR=${WRKSRC} FLAVOUR=${FLAVOUR} metadata
-	@${MAKE} DESTDIR=${WRKSRC} FLAVOUR=${FLAVOUR} install
+	@echo -n ">>> Generating metadata for ${PLUGIN_PKGNAME}-${PLUGIN_PKGVERSION}..."
+	@${MAKE} DESTDIR=${WRKSRC} metadata
+	@echo " done"
+	@echo -n ">>> Staging files for ${PLUGIN_PKGNAME}-${PLUGIN_PKGVERSION}..."
+	@${MAKE} DESTDIR=${WRKSRC} install
+	@echo " done"
+	@echo ">>> Packaging files for ${PLUGIN_PKGNAME}-${PLUGIN_PKGVERSION}:"
 	@${PKG} create -v -m ${WRKSRC} -r ${WRKSRC} \
 	    -p ${WRKSRC}/plist -o ${PKGDIR}
 
@@ -254,24 +264,44 @@ clean: check
 	    git checkout -f ${.CURDIR}/src && \
 	    git clean -xdqf ${.CURDIR}/src; \
 	fi
+	@rm -rf ${.CURDIR}/work
 
 lint-desc: check
 	@if [ ! -f ${.CURDIR}/${PLUGIN_DESC} ]; then \
 		echo ">>> Missing ${PLUGIN_DESC}"; exit 1; \
 	fi
 
-lint: lint-desc
-	find ${.CURDIR}/src \
-	    -name "*.sh" -type f -print0 | xargs -0 -n1 sh -n
-	find ${.CURDIR}/src \
+lint-shell:
+	@for FILE in $$(find ${.CURDIR}/src -name "*.sh" -type f); do \
+	    if [ "$$(head $${FILE} | grep -c '^#!\/bin\/sh$$')" == "0" ]; then \
+	        echo "Missing shebang in $${FILE}"; exit 1; \
+	    fi; \
+	    sh -n $${FILE} || exit 1; \
+	done
+
+lint-xml:
+	@find ${.CURDIR}/src \
 	    -name "*.xml" -type f -print0 | xargs -0 -n1 xmllint --noout
-	find ${.CURDIR}/src \
+
+lint-exec: check
+.for DIR in ${.CURDIR}/src/opnsense/scripts ${.CURDIR}/src/etc/rc.d ${.CURDIR}/src/etc/rc.syshook.d
+.if exists(${DIR})
+	@find ${DIR} -type f ! -name "*.xml" -print0 | \
+	    xargs -0 -t -n1 test -x || \
+	    (echo "Missing executable permission in ${DIR}"; exit 1)
+.endif
+.endfor
+
+lint-php: check
+	@find ${.CURDIR}/src \
 	    ! -name "*.xml" ! -name "*.xml.sample" ! -name "*.eot" \
 	    ! -name "*.svg" ! -name "*.woff" ! -name "*.woff2" \
 	    ! -name "*.otf" ! -name "*.png" ! -name "*.js" \
 	    ! -name "*.scss" ! -name "*.py" ! -name "*.ttf" \
 	    ! -name "*.tgz" ! -name "*.xml.dist" ! -name "*.sh" \
 	    -type f -print0 | xargs -0 -n1 php -l
+
+lint: lint-desc lint-shell lint-xml lint-exec lint-php
 
 sweep: check
 	find ${.CURDIR}/src -type f -name "*.map" -print0 | \
@@ -286,7 +316,7 @@ sweep: check
 	find ${.CURDIR} -type f -depth 1 -print0 | \
 	    xargs -0 -n1 ${.CURDIR}/../../Scripts/cleanfile
 
-STYLEDIRS?=	src/etc/inc/plugins.inc.d src/opnsense
+STYLEDIRS?=	src/etc/inc src/opnsense
 
 style: check
 	@: > ${.CURDIR}/.style.out

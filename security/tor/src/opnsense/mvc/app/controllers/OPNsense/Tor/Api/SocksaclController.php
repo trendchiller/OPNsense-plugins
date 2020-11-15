@@ -28,12 +28,12 @@
 
 namespace OPNsense\Tor\Api;
 
-use \OPNsense\Base\ApiMutableModelControllerBase;
+use OPNsense\Base\ApiMutableModelControllerBase;
 
 class SocksaclController extends ApiMutableModelControllerBase
 {
-    static protected $internalModelName = 'policy';
-    static protected $internalModelClass = '\OPNsense\Tor\ACLSocksPolicy';
+    protected static $internalModelName = 'policy';
+    protected static $internalModelClass = '\OPNsense\Tor\ACLSocksPolicy';
     public function searchaclAction()
     {
         return $this->searchBase('policy', array('enabled', 'type', 'network', 'action'));

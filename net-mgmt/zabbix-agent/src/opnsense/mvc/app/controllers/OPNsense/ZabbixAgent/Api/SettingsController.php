@@ -1,4 +1,5 @@
 <?php
+
 /**
  *    Copyright (C) 2017 Frank Wall
  *    Copyright (C) 2015 Deciso B.V.
@@ -27,12 +28,13 @@
  *    POSSIBILITY OF SUCH DAMAGE.
  *
  */
+
 namespace OPNsense\ZabbixAgent\Api;
 
-use \OPNsense\Base\ApiMutableModelControllerBase;
-use \OPNsense\Base\UIModelGrid;
-use \OPNsense\Core\Config;
-use \OPNsense\ZabbixAgent\ZabbixAgent;
+use OPNsense\Base\ApiMutableModelControllerBase;
+use OPNsense\Base\UIModelGrid;
+use OPNsense\Core\Config;
+use OPNsense\ZabbixAgent\ZabbixAgent;
 
 /**
  * Class SettingsController
@@ -40,6 +42,68 @@ use \OPNsense\ZabbixAgent\ZabbixAgent;
  */
 class SettingsController extends ApiMutableModelControllerBase
 {
-    static protected $internalModelName = 'zabbixagent';
-    static protected $internalModelClass = '\OPNsense\ZabbixAgent\ZabbixAgent';
+    protected static $internalModelName = 'zabbixagent';
+    protected static $internalModelClass = '\OPNsense\ZabbixAgent\ZabbixAgent';
+
+    public function searchUserparametersAction()
+    {
+        return $this->searchBase('userparameters.userparameter', array("enabled", "key", "command"));
+    }
+
+    public function getUserparameterAction($uuid = null)
+    {
+        $this->sessionClose();
+        return $this->getBase('userparameter', 'userparameters.userparameter', $uuid);
+    }
+
+    public function addUserparameterAction()
+    {
+        return $this->addBase('userparameter', 'userparameters.userparameter');
+    }
+
+    public function delUserparameterAction($uuid)
+    {
+        return $this->delBase('userparameters.userparameter', $uuid);
+    }
+
+    public function setUserparameterAction($uuid)
+    {
+        return $this->setBase('userparameter', 'userparameters.userparameter', $uuid);
+    }
+
+    public function toggleUserparameterAction($uuid)
+    {
+        return $this->toggleBase('userparameters.userparameter', $uuid);
+    }
+
+    public function searchAliasesAction()
+    {
+        return $this->searchBase('aliases.alias', array("enabled", "key", "sourceKey"));
+    }
+
+    public function getAliasAction($uuid = null)
+    {
+        $this->sessionClose();
+        return $this->getBase('alias', 'aliases.alias', $uuid);
+    }
+
+    public function addAliasAction()
+    {
+        return $this->addBase('alias', 'aliases.alias');
+    }
+
+    public function delAliasAction($uuid)
+    {
+        return $this->delBase('aliases.alias', $uuid);
+    }
+
+    public function setAliasAction($uuid)
+    {
+        return $this->setBase('alias', 'aliases.alias', $uuid);
+    }
+
+    public function toggleAliasAction($uuid)
+    {
+        return $this->toggleBase('aliases.alias', $uuid);
+    }
 }

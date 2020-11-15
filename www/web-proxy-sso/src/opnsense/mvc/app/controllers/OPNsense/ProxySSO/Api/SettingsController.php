@@ -28,8 +28,8 @@
 
 namespace OPNsense\ProxySSO\Api;
 
-use \OPNsense\Base\ApiMutableModelControllerBase;
-use \OPNsense\Core\Config;
+use OPNsense\Base\ApiMutableModelControllerBase;
+use OPNsense\Core\Config;
 
 /**
  * Class SettingsController Handles settings related API actions for the ProxySSO
@@ -37,6 +37,6 @@ use \OPNsense\Core\Config;
  */
 class SettingsController extends ApiMutableModelControllerBase
 {
-    static protected $internalModelName = "ProxySSO";
-    static protected $internalModelClass = "\OPNsense\ProxySSO\ProxySSO";
+    protected static $internalModelName = "ProxySSO";
+    protected static $internalModelClass = "\OPNsense\ProxySSO\ProxySSO";
 }

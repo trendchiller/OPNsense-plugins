@@ -1,7 +1,7 @@
 <?php
 
 /*
-    Copyright (C) 2018 Michael Muenz
+    Copyright (C) 2018 Michael Muenz <m.muenz@gmail.com>
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -52,4 +52,13 @@ function bind_services()
     );
 
     return $services;
+}
+
+function bind_xmlrpc_sync()
+{
+    $result = array();
+    $result['id'] = 'bind';
+    $result['section'] = 'OPNsense.bind';
+    $result['description'] = gettext('BIND domain name service');
+    return array($result);
 }

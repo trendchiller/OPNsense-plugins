@@ -5,6 +5,12 @@
     <type>checkbox</type>
   </field>
   <field>
+    <id>neighbor.description</id>
+    <label>Description</label>
+    <type>text</type>
+    <help>Set an optional description for this neighbor.</help>
+  </field>
+  <field>
     <id>neighbor.address</id>
     <label>Peer-IP</label>
     <type>text</type>
@@ -25,6 +31,11 @@
   <field>
     <id>neighbor.nexthopself</id>
     <label>Next-Hop-Self</label>
+    <type>checkbox</type>
+  </field>
+  <field>
+    <id>neighbor.multihop</id>
+    <label>Multi-Hop</label>
     <type>checkbox</type>
   </field>
     <field>

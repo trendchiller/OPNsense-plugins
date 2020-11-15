@@ -1,4 +1,5 @@
 <?php
+
 /*
 
     Copyright (C) 2018 Fabian Franz
@@ -37,6 +38,10 @@ namespace OPNsense\Nginx;
 */
 class IndexController extends \OPNsense\Base\IndexController
 {
+    /**
+     * show the configuration page /ui/nginx
+     * @throws \Exception when a form cannot be loaded
+     */
     public function indexAction()
     {
         $this->view->settings = $this->getForm("settings");
@@ -46,10 +51,54 @@ class IndexController extends \OPNsense\Base\IndexController
         $this->view->credential = $this->getForm("credential");
         $this->view->userlist = $this->getForm("userlist");
         $this->view->httpserver = $this->getForm("httpserver");
+        $this->view->streamserver = $this->getForm("streamserver");
         $this->view->httprewrite = $this->getForm("httprewrite");
         $this->view->naxsi_rule = $this->getForm("naxsi_rule");
         $this->view->naxsi_custom_policy = $this->getForm("naxsi_custom_policy");
         $this->view->security_headers = $this->getForm("security_headers");
+        $this->view->limit_request_connection = $this->getForm("limit_request_connection");
+        $this->view->limit_zone = $this->getForm("limit_zone");
+        $this->view->cache_path = $this->getForm("cache_path");
+        $this->view->sni_hostname_map = $this->getForm("sni_hostname_map");
+        $this->view->ipacl = $this->getForm("ipacl");
+        $this->view->tls_fingerprint = $this->getForm("tls_fingerprint");
+        $this->view->syslog_target = $this->getForm("syslog_target");
+        $nginx = new Nginx();
+        $this->view->show_naxsi_download_button =
+            count(iterator_to_array($nginx->custom_policy->iterateItems())) == 0 &&
+            count(iterator_to_array($nginx->naxsi_rule->iterateItems())) == 0;
         $this->view->pick('OPNsense/Nginx/index');
+    }
+
+    /**
+     * show the nginx logs page /ui/nginx/index/logs
+     */
+    public function logsAction()
+    {
+        $this->view->pick('OPNsense/Nginx/logs');
+    }
+
+    /**
+     * show the nginx TLS handshakes page /ui/nginx/index/tls_handshakes
+     */
+    public function tls_handshakesAction()
+    {
+        $this->view->pick('OPNsense/Nginx/tls_handshakes');
+    }
+
+    /**
+     * display a viewer for banned IPs.
+     */
+    public function banAction()
+    {
+        $this->view->pick('OPNsense/Nginx/ban');
+    }
+
+    /**
+     * display a viewer for traffic statistics.
+     */
+    public function vtsAction()
+    {
+        $this->view->pick('OPNsense/Nginx/vts');
     }
 }

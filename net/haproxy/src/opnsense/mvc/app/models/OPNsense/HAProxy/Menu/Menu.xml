@@ -5,17 +5,22 @@
               <GeneralSettings VisibleName="Service Settings" url="/ui/haproxy#subtab_haproxy-general-settings"/>
               <PeerSync VisibleName="Peers / Session Sync" url="/ui/haproxy#subtab_haproxy-general-peers"/>
               <GlobalParameters VisibleName="Global Parameters" url="/ui/haproxy#subtab_haproxy-general-global"/>
-              <DefaultParameters VisibleName="Detault Parameters" url="/ui/haproxy#subtab_haproxy-general-defaults"/>
+              <DefaultParameters VisibleName="Default Parameters" url="/ui/haproxy#subtab_haproxy-general-defaults"/>
               <LoggingConfiguration VisibleName="Logging Configuration" url="/ui/haproxy#subtab_haproxy-general-logging"/>
               <StatisticsConfiguration VisibleName="Statistics Configuration" url="/ui/haproxy#subtab_haproxy-general-statistics"/>
+              <CacheConfiguration VisibleName="Cache Configuration" url="/ui/haproxy#subtab_haproxy-general-cache"/>
               <Frontends VisibleName="Frontends" url="/ui/haproxy#frontends"/>
               <Backends VisibleName="Backends" url="/ui/haproxy#backends"/>
               <Servers VisibleName="Servers" url="/ui/haproxy#servers"/>
               <HealthChecks VisibleName="Health Checks" url="/ui/haproxy#healthchecks"/>
               <Actions VisibleName="Actions" url="/ui/haproxy#actions"/>
               <Acls VisibleName="ACLs" url="/ui/haproxy#acls"/>
+              <Users VisibleName="Users" url="/ui/haproxy#users"/>
+              <Groups VisibleName="Groups" url="/ui/haproxy#groups"/>
               <Luas VisibleName="Lua Scripts" url="/ui/haproxy#luas"/>
               <Errorfiles VisibleName="Error Files" url="/ui/haproxy#errorfiles"/>
+              <Mapfiles VisibleName="Map Files" url="/ui/haproxy#mapfiles"/>
+              <Resolvers VisibleName="Resolvers" url="/ui/haproxy#resolvers"/>
           </Settings>
           <Statistics order="20" url="/ui/haproxy/statistics">
               <Overview VisibleName="Overview" url="/ui/haproxy/statistics#info"/>
@@ -23,7 +28,7 @@
               <Counters VisibleName="Counters" url="/ui/haproxy/statistics#counters"/>
               <StickTables VisibleName="Stick Tables" url="/ui/haproxy/statistics#tables"/>
           </Statistics>
-          <Log VisibleName="Log File" order="30" url="/diag_logs_haproxy.php"/>
+          <Log VisibleName="Log File" order="30" url="/ui/diagnostics/log/core/haproxy"/>
       </HAProxy>
     </Services>
 </menu>

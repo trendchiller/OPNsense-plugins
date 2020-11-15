@@ -1,6 +1,7 @@
 <?php
+
 /**
- *    Copyright (C) 2018 Michael Muenz
+ *    Copyright (C) 2018 Michael Muenz <m.muenz@gmail.com>
  *
  *    All rights reserved.
  *
@@ -29,12 +30,12 @@
 
 namespace OPNsense\Wireguard\Api;
 
-use \OPNsense\Base\ApiMutableModelControllerBase;
+use OPNsense\Base\ApiMutableModelControllerBase;
 
 class ClientController extends ApiMutableModelControllerBase
 {
-    static protected $internalModelName = 'client';
-    static protected $internalModelClass = '\OPNsense\Wireguard\Client';
+    protected static $internalModelName = 'client';
+    protected static $internalModelClass = '\OPNsense\Wireguard\Client';
 
     public function searchClientAction()
     {

@@ -1,7 +1,8 @@
 <?php
+
 /*
 
-    Copyright (C) 2017 Michael Muenz
+    Copyright (C) 2017 Michael Muenz <m.muenz@gmail.com>
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -31,8 +32,8 @@
 
 namespace OPNsense\Nut;
 
-use \OPNsense\Core\Backend;
-use \OPNsense\Nut;
+use OPNsense\Core\Backend;
+use OPNsense\Nut;
 
 /**
 * Class IndexController

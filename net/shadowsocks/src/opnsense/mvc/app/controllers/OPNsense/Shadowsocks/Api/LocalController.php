@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (C) 2018 Michael Muenz
+ * Copyright (C) 2018 Michael Muenz <m.muenz@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,6 +32,6 @@ use OPNsense\Base\ApiMutableModelControllerBase;
 
 class LocalController extends ApiMutableModelControllerBase
 {
-    static protected $internalModelClass = '\OPNsense\Shadowsocks\Local';
-    static protected $internalModelName = 'local';
+    protected static $internalModelClass = '\OPNsense\Shadowsocks\Local';
+    protected static $internalModelName = 'local';
 }

@@ -1,7 +1,7 @@
 {#
 
 OPNsense® is Copyright © 2014 – 2017 by Deciso B.V.
-This file is Copyright © 2017 by Michael Muenz
+This file is Copyright © 2017 by Michael Muenz <m.muenz@gmail.com>
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -42,18 +42,14 @@ POSSIBILITY OF SUCH DAMAGE.
             formatTokenizersUI();
             $('.selectpicker').selectpicker('refresh');
         });
-        ajaxCall(url="/api/freeradius/service/status", sendData={}, callback=function (data, status) {
-            updateServiceStatusUI(data['status']);
-        });
+        updateServiceControlUI('freeradius');
 
         // link save button to API set action
         $("#saveAct").click(function () {
             saveFormToEndpoint(url="/api/freeradius/general/set", formid='frm_general_settings',callback_ok=function () {
             $("#saveAct_progress").addClass("fa fa-spinner fa-pulse");
                 ajaxCall(url="/api/freeradius/service/reconfigure", sendData={}, callback=function (data,status) {
-                    ajaxCall(url="/api/freeradius/service/status", sendData={}, callback=function (data,status) {
-                        updateServiceStatusUI(data['status']);
-                    });
+                    updateServiceControlUI('freeradius');
                     $("#saveAct_progress").removeClass("fa fa-spinner fa-pulse");
                 });
             });

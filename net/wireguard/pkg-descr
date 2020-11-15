@@ -12,3 +12,24 @@ most secure, easiest to use, and simplest VPN solution in
 the industry.
 
 WWW: https://www.wireguard.com/
+
+Changelog
+---------
+
+1.3
+
+* Client/peer name validation to use HostnameField
+
+1.2
+
+* Dashboard widget (contributed by D. Domig)
+
+1.1
+
+* Allow adding interface route for PBR
+
+1.0
+
+* Support for most features like S2S, Roadwarrior
+* DNS, MTU, PSK
+* Allow to disable setting routes for PBR

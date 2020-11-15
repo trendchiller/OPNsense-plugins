@@ -1,7 +1,7 @@
 <form>
   <field>
     <id>upstream_server.description</id>
-    <label>Beschreibung</label>
+    <label>Description</label>
     <type>text</type>
   </field>
   <field>
@@ -37,6 +37,7 @@
   <field>
     <id>upstream_server.no_use</id>
     <label>Do Not Use</label>
+    <advanced>true</advanced>
     <type>dropdown</type>
   </field>
 </form>

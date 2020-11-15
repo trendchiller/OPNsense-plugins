@@ -1,7 +1,7 @@
 <?php
 
 /*
-    Copyright (C) 2017 Michael Muenz
+    Copyright (C) 2017 Michael Muenz <m.muenz@gmail.com>
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -52,10 +52,16 @@ function postfix_syslog()
 {
     $syslogconf = array();
 
-    $syslogconf['mail'] = array(
-        'facility' => array('postfix'),
-        'remote' => 'mail',
-    );
+    $syslogconf['postfix'] = array('facility' => array('postfix'));
 
     return $syslogconf;
+}
+
+function postfix_xmlrpc_sync()
+{
+    $result = array();
+    $result['id'] = 'postfix';
+    $result['section'] = 'OPNsense.postfix';
+    $result['description'] = gettext('Postfix');
+    return array($result);
 }

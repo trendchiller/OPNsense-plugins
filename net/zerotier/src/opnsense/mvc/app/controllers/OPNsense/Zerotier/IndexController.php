@@ -1,4 +1,5 @@
 <?php
+
 /**
  *    Copyright (C) 2017 David Harrigan
  *    Copyright (C) 2017 Deciso B.V.
@@ -27,6 +28,7 @@
  *    POSSIBILITY OF SUCH DAMAGE.
  *
  */
+
 namespace OPNsense\Zerotier;
 
 class IndexController extends \OPNsense\Base\IndexController

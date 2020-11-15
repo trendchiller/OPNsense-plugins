@@ -1,9 +1,7 @@
 <model>
     <mount>//OPNsense/HAProxy</mount>
-    <version>2.3.0</version>
-    <description>
-        the HAProxy load balancer
-    </description>
+    <version>2.10.0</version>
+    <description>the HAProxy load balancer</description>
     <items>
         <general>
             <enabled type="BooleanField">
@@ -14,6 +12,10 @@
                 <default>0</default>
                 <Required>Y</Required>
             </gracefulStop>
+            <seamlessReload type="BooleanField">
+                <default>0</default>
+                <Required>Y</Required>
+            </seamlessReload>
             <showIntro type="BooleanField">
                 <default>1</default>
             </showIntro>
@@ -67,6 +69,13 @@
                     <ValidationMessage>Please specify a value between 1 and 128.</ValidationMessage>
                     <Required>Y</Required>
                 </nbproc>
+                <nbthread type="IntegerField">
+                    <default>1</default>
+                    <MinimumValue>1</MinimumValue>
+                    <MaximumValue>1024</MaximumValue>
+                    <ValidationMessage>Please specify a value between 1 and 1024.</ValidationMessage>
+                    <Required>N</Required>
+                </nbthread>
                 <sslServerVerify type="OptionField">
                     <Required>Y</Required>
                     <default>ignore</default>
@@ -127,18 +136,44 @@
                         <no-tlsv10>no-tlsv10</no-tlsv10>
                         <no-tlsv11>no-tlsv11</no-tlsv11>
                         <no-tlsv12>no-tlsv12</no-tlsv12>
+                        <no-tlsv13>no-tlsv13</no-tlsv13>
                         <no-tls-tickets>no-tls-tickets</no-tls-tickets>
                         <force-sslv3>force-sslv3</force-sslv3>
                         <force-tlsv10>force-tlsv10</force-tlsv10>
                         <force-tlsv11>force-tlsv11</force-tlsv11>
                         <force-tlsv12>force-tlsv12</force-tlsv12>
+                        <force-tlsv13>force-tlsv13</force-tlsv13>
                         <strict-sni>strict-sni</strict-sni>
                     </OptionValues>
                 </ssl_bindOptions>
+                <ssl_minVersion type="OptionField">
+                    <Required>N</Required>
+                    <OptionValues>
+                        <SSLv3>SSLv3</SSLv3>
+                        <TLSv1.0>TLSv1.0</TLSv1.0>
+                        <TLSv1.1>TLSv1.1</TLSv1.1>
+                        <TLSv1.2>TLSv1.2</TLSv1.2>
+                        <TLSv1.3>TLSv1.3</TLSv1.3>
+                    </OptionValues>
+                </ssl_minVersion>
+                <ssl_maxVersion type="OptionField">
+                    <Required>N</Required>
+                    <OptionValues>
+                        <SSLv3>SSLv3</SSLv3>
+                        <TLSv1.0>TLSv1.0</TLSv1.0>
+                        <TLSv1.1>TLSv1.1</TLSv1.1>
+                        <TLSv1.2>TLSv1.2</TLSv1.2>
+                        <TLSv1.3>TLSv1.3</TLSv1.3>
+                    </OptionValues>
+                </ssl_maxVersion>
                 <ssl_cipherList type="TextField">
                     <default>ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256</default>
                     <Required>N</Required>
                 </ssl_cipherList>
+                <ssl_cipherSuites type="TextField">
+                    <default>TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256:TLS_AES_128_GCM_SHA256</default>
+                    <Required>N</Required>
+                </ssl_cipherSuites>
             </tuning>
             <defaults>
                 <maxConnections type="IntegerField">
@@ -190,6 +225,17 @@
                         <x-3>redispatch on the 3rd retry prior to the last retry</x-3>
                     </OptionValues>
                 </redispatch>
+                <init_addr type="OptionField">
+                    <Required>N</Required>
+                    <default>last,libc</default>
+                    <Multiple>Y</Multiple>
+                    <Sorted>Y</Sorted>
+                    <OptionValues>
+                        <last>last</last>
+                        <libc>libc</libc>
+                        <none>none</none>
+                    </OptionValues>
+                </init_addr>
                 <customOptions type="TextField">
                     <Required>N</Required>
                 </customOptions>
@@ -287,10 +333,60 @@
                     <mask>/^((([0-9a-zA-Z._\-]+:[0-9a-zA-Z._\-]+)([,]){0,1}))*/u</mask>
                     <ValidationMessage>Please provide a valid user and password, i.e. user:secret123.</ValidationMessage>
                 </users>
+                <allowedUsers type="ModelRelationField">
+                    <Model>
+                        <template>
+                            <source>OPNsense.HAProxy.HAProxy</source>
+                            <items>users.user</items>
+                            <display>name</display>
+                        </template>
+                    </Model>
+                    <ValidationMessage>Related user not found</ValidationMessage>
+                    <multiple>Y</multiple>
+                    <Required>N</Required>
+                </allowedUsers>
+                <allowedGroups type="ModelRelationField">
+                    <Model>
+                        <template>
+                            <source>OPNsense.HAProxy.HAProxy</source>
+                            <items>groups.group</items>
+                            <display>name</display>
+                        </template>
+                    </Model>
+                    <ValidationMessage>Related group not found</ValidationMessage>
+                    <multiple>Y</multiple>
+                    <Required>N</Required>
+                </allowedGroups>
                 <customOptions type="TextField">
                     <Required>N</Required>
                 </customOptions>
             </stats>
+            <cache>
+                <enabled type="BooleanField">
+                    <default>0</default>
+                    <Required>N</Required>
+                </enabled>
+                <totalMaxSize type="IntegerField">
+                    <MinimumValue>1</MinimumValue>
+                    <MaximumValue>4095</MaximumValue>
+                    <default>4</default>
+                    <Required>Y</Required>
+                    <ValidationMessage>Please specify a value between 1 and 4095.</ValidationMessage>
+                </totalMaxSize>
+                <maxAge type="IntegerField">
+                    <MinimumValue>1</MinimumValue>
+                    <MaximumValue>3600</MaximumValue>
+                    <default>60</default>
+                    <Required>N</Required>
+                    <ValidationMessage>Please specify a value between 1 and 3600.</ValidationMessage>
+                </maxAge>
+                <maxObjectSize type="IntegerField">
+                    <MinimumValue>1</MinimumValue>
+                    <MaximumValue>2146435072</MaximumValue>
+                    <Required>N</Required>
+                    <ValidationMessage>Please specify a value between 1 and 2146435072.</ValidationMessage>
+                </maxObjectSize>
+            </cache>
         </general>
         <frontends>
             <frontend type="ArrayField">
@@ -303,7 +399,7 @@
                 </enabled>
                 <name type="TextField">
                     <Required>Y</Required>
-                    <mask>/^([0-9a-zA-Z._]){1,255}$/u</mask>
+                    <mask>/^([0-9a-zA-Z._\-]){1,255}$/u</mask>
                     <ValidationMessage>Should be a string between 1 and 255 characters.</ValidationMessage>
                 </name>
                 <description type="TextField">
@@ -314,9 +410,9 @@
                 <bind type="CSVListField">
                     <Required>Y</Required>
                     <multiple>Y</multiple>
-                    <mask>/^((([0-9a-zA-Z._\-\*:]+:[0-9]+(-[0-9]+)?)([,]){0,1}))*/u</mask>
+                    <mask>/^((([0-9a-zA-Z._\-\*:\[\]]+:[0-9]+(-[0-9]+)?)([,]){0,1}))*/u</mask>
                     <ChangeCase>lower</ChangeCase>
-                    <ValidationMessage>Please provide a valid listen address, i.e. 127.0.0.1:8080 or www.example.com:443. Port range as start-end, i.e. 127.0.0.1:1220-1240.</ValidationMessage>
+                    <ValidationMessage>Please provide a valid listen address, i.e. 127.0.0.1:8080, [::1]:8080 or www.example.com:443. Port range as start-end, i.e. 127.0.0.1:1220-1240.</ValidationMessage>
                 </bind>
                 <bindOptions type="TextField">
                     <Required>N</Required>
@@ -365,24 +461,51 @@
                 <ssl_bindOptions type="OptionField">
                     <Required>N</Required>
                     <default>no-sslv3,no-tlsv10,no-tls-tickets</default>
+                    <Sorted>Y</Sorted>
                     <Multiple>Y</Multiple>
                     <OptionValues>
                         <no-sslv3>no-sslv3</no-sslv3>
                         <no-tlsv10>no-tlsv10</no-tlsv10>
                         <no-tlsv11>no-tlsv11</no-tlsv11>
                         <no-tlsv12>no-tlsv12</no-tlsv12>
+                        <no-tlsv13>no-tlsv13</no-tlsv13>
                         <no-tls-tickets>no-tls-tickets</no-tls-tickets>
                         <force-sslv3>force-sslv3</force-sslv3>
                         <force-tlsv10>force-tlsv10</force-tlsv10>
                         <force-tlsv11>force-tlsv11</force-tlsv11>
                         <force-tlsv12>force-tlsv12</force-tlsv12>
+                        <force-tlsv13>force-tlsv13</force-tlsv13>
                         <strict-sni>strict-sni</strict-sni>
                     </OptionValues>
                 </ssl_bindOptions>
+                <ssl_minVersion type="OptionField">
+                    <Required>N</Required>
+                    <OptionValues>
+                        <SSLv3>SSLv3</SSLv3>
+                        <TLSv1.0>TLSv1.0</TLSv1.0>
+                        <TLSv1.1>TLSv1.1</TLSv1.1>
+                        <TLSv1.2>TLSv1.2</TLSv1.2>
+                        <TLSv1.3>TLSv1.3</TLSv1.3>
+                    </OptionValues>
+                </ssl_minVersion>
+                <ssl_maxVersion type="OptionField">
+                    <Required>N</Required>
+                    <OptionValues>
+                        <SSLv3>SSLv3</SSLv3>
+                        <TLSv1.0>TLSv1.0</TLSv1.0>
+                        <TLSv1.1>TLSv1.1</TLSv1.1>
+                        <TLSv1.2>TLSv1.2</TLSv1.2>
+                        <TLSv1.3>TLSv1.3</TLSv1.3>
+                    </OptionValues>
+                </ssl_maxVersion>
                 <ssl_cipherList type="TextField">
                     <default>ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256</default>
                     <Required>N</Required>
                 </ssl_cipherList>
+                <ssl_cipherSuites type="TextField">
+                    <default>TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256:TLS_AES_128_GCM_SHA256</default>
+                    <Required>N</Required>
+                </ssl_cipherSuites>
                 <ssl_hstsEnabled type="BooleanField">
                     <default>1</default>
                     <Required>Y</Required>
@@ -402,6 +525,59 @@
                     <ValidationMessage>Please specify a value between 1 and 1000000000.</ValidationMessage>
                     <Required>Y</Required>
                 </ssl_hstsMaxAge>
+                <ssl_clientAuthEnabled type="BooleanField">
+                    <default>0</default>
+                    <Required>N</Required>
+                </ssl_clientAuthEnabled>
+                <ssl_clientAuthVerify type="OptionField">
+                    <Required>N</Required>
+                    <default>required</default>
+                    <OptionValues>
+                        <none>none</none>
+                        <optional>optional</optional>
+                        <required>required</required>
+                    </OptionValues>
+                </ssl_clientAuthVerify>
+                <ssl_clientAuthCAs type="CertificateField">
+                    <Required>N</Required>
+                    <Type>ca</Type>
+                    <Multiple>Y</Multiple>
+                    <ValidationMessage>Please select a valid CA from the list.</ValidationMessage>
+                </ssl_clientAuthCAs>
+                <ssl_clientAuthCRLs type="CertificateField">
+                    <Required>N</Required>
+                    <Type>crl</Type>
+                    <Multiple>Y</Multiple>
+                    <ValidationMessage>Please select a valid CA from the list.</ValidationMessage>
+                </ssl_clientAuthCRLs>
+                <basicAuthEnabled type="BooleanField">
+                    <default>0</default>
+                    <Required>N</Required>
+                </basicAuthEnabled>
+                <basicAuthUsers type="ModelRelationField">
+                    <Model>
+                        <template>
+                            <source>OPNsense.HAProxy.HAProxy</source>
+                            <items>users.user</items>
+                            <display>name</display>
+                        </template>
+                    </Model>
+                    <ValidationMessage>Related user not found</ValidationMessage>
+                    <multiple>Y</multiple>
+                    <Required>N</Required>
+                </basicAuthUsers>
+                <basicAuthGroups type="ModelRelationField">
+                    <Model>
+                        <template>
+                            <source>OPNsense.HAProxy.HAProxy</source>
+                            <items>groups.group</items>
+                            <display>name</display>
+                        </template>
+                    </Model>
+                    <ValidationMessage>Related group not found</ValidationMessage>
+                    <multiple>Y</multiple>
+                    <Required>N</Required>
+                </basicAuthGroups>
                 <tuning_maxConnections type="IntegerField">
                     <MinimumValue>1</MinimumValue>
                     <MaximumValue>500000</MaximumValue>
@@ -423,6 +599,18 @@
                     <ValidationMessage>Should be a number between 1 and 8 characters, optionally followed by either "d", "h", "m", "s", "ms" or "us".</ValidationMessage>
                     <Required>N</Required>
                 </tuning_timeoutHttpKeepAlive>
+                <linkedCpuAffinityRules type="ModelRelationField">
+                    <Model>
+                        <template>
+                            <source>OPNsense.HAProxy.HAProxy</source>
+                            <items>cpus.cpu</items>
+                            <display>name</display>
+                        </template>
+                    </Model>
+                    <ValidationMessage>Related CPU affinity rule not found</ValidationMessage>
+                    <Multiple>Y</Multiple>
+                    <Required>N</Required>
+                </linkedCpuAffinityRules>
                 <logging_dontLogNull type="BooleanField">
                     <default>0</default>
                     <Required>Y</Required>
@@ -538,6 +726,25 @@
                     <ValidationMessage>Should be a number between 1 and 8 characters, optionally followed by either "d", "h", "m", "s", "ms" or "us".</ValidationMessage>
                     <Required>N</Required>
                 </stickiness_bytesOutRatePeriod>
+                <http2Enabled type="BooleanField">
+                    <default>0</default>
+                    <Required>N</Required>
+                </http2Enabled>
+                <http2Enabled_nontls type="BooleanField">
+                    <default>0</default>
+                    <Required>N</Required>
+                </http2Enabled_nontls>
+                <advertised_protocols type="OptionField">
+                    <Required>N</Required>
+                    <default>h2,http11</default>
+                    <Sorted>Y</Sorted>
+                    <Multiple>Y</Multiple>
+                    <OptionValues>
+                        <h2>HTTP/2</h2>
+                        <http11>HTTP/1.1</http11>
+                        <http10>HTTP/1.0</http10>
+                    </OptionValues>
+                </advertised_protocols>
                 <forwardFor type="BooleanField">
                     <default>0</default>
                     <Required>Y</Required>
@@ -565,6 +772,7 @@
                         </template>
                     </Model>
                     <ValidationMessage>Related action item not found</ValidationMessage>
+                    <Sorted>Y</Sorted>
                     <multiple>Y</multiple>
                     <Required>N</Required>
                 </linkedActions>
@@ -593,7 +801,7 @@
                 </enabled>
                 <name type="TextField">
                     <Required>Y</Required>
-                    <mask>/^([0-9a-zA-Z._]){1,255}$/u</mask>
+                    <mask>/^([0-9a-zA-Z._\-]){1,255}$/u</mask>
                     <ValidationMessage>Should be a string between 1 and 255 characters.</ValidationMessage>
                 </name>
                 <description type="TextField">
@@ -618,8 +826,16 @@
                         <static-rr>Static Round Robin</static-rr>
                         <leastconn>Least Connections</leastconn>
                         <uri>URI Hash (only HTTP mode)</uri>
+                        <random>Random Algorithm</random>
                     </OptionValues>
                 </algorithm>
+                <random_draws type="IntegerField">
+                    <Required>Y</Required>
+                    <default>2</default>
+                    <MinimumValue>2</MinimumValue>
+                    <MaximumValue>1000</MaximumValue>
+                    <ValidationMessage>Please specify a value between 2 and 1000.</ValidationMessage>
+                </random_draws>
                 <proxyProtocol type="OptionField">
                     <Required>N</Required>
                     <OptionValues>
@@ -639,6 +855,18 @@
                     <Multiple>Y</Multiple>
                     <Required>N</Required>
                 </linkedServers>
+                <linkedResolver type="ModelRelationField">
+                    <Model>
+                        <template>
+                            <source>OPNsense.HAProxy.HAProxy</source>
+                            <items>resolvers.resolver</items>
+                            <display>name</display>
+                        </template>
+                    </Model>
+                    <ValidationMessage>Related resolver not found</ValidationMessage>
+                    <multiple>N</multiple>
+                    <Required>N</Required>
+                </linkedResolver>
                 <source type="TextField">
                     <mask>/^((([0-9a-zA-Z._\-\*:]+)))*/u</mask>
                     <ChangeCase>lower</ChangeCase>
@@ -687,6 +915,25 @@
                     <ValidationMessage>Please specify a value between 1 and 100.</ValidationMessage>
                     <Required>N</Required>
                 </healthCheckRise>
+                <http2Enabled type="BooleanField">
+                    <default>0</default>
+                    <Required>N</Required>
+                </http2Enabled>
+                <http2Enabled_nontls type="BooleanField">
+                    <default>0</default>
+                    <Required>N</Required>
+                </http2Enabled_nontls>
+                <ba_advertised_protocols type="OptionField">
+                    <Required>N</Required>
+                    <default>h2,http11</default>
+                    <Sorted>Y</Sorted>
+                    <Multiple>Y</Multiple>
+                    <OptionValues>
+                        <h2>HTTP/2</h2>
+                        <http11>HTTP/1.1</http11>
+                        <http10>HTTP/1.0</http10>
+                    </OptionValues>
+                </ba_advertised_protocols>
                 <persistence type="OptionField">
                     <Required>N</Required>
                     <default>sticktable</default>
@@ -803,6 +1050,34 @@
                     <ValidationMessage>Should be a number between 1 and 8 characters, optionally followed by either "d", "h", "m", "s", "ms" or "us".</ValidationMessage>
                     <Required>N</Required>
                 </stickiness_bytesOutRatePeriod>
+                <basicAuthEnabled type="BooleanField">
+                    <default>0</default>
+                    <Required>N</Required>
+                </basicAuthEnabled>
+                <basicAuthUsers type="ModelRelationField">
+                    <Model>
+                        <template>
+                            <source>OPNsense.HAProxy.HAProxy</source>
+                            <items>users.user</items>
+                            <display>name</display>
+                        </template>
+                    </Model>
+                    <ValidationMessage>Related user not found</ValidationMessage>
+                    <multiple>Y</multiple>
+                    <Required>N</Required>
+                </basicAuthUsers>
+                <basicAuthGroups type="ModelRelationField">
+                    <Model>
+                        <template>
+                            <source>OPNsense.HAProxy.HAProxy</source>
+                            <items>groups.group</items>
+                            <display>name</display>
+                        </template>
+                    </Model>
+                    <ValidationMessage>Related group not found</ValidationMessage>
+                    <multiple>Y</multiple>
+                    <Required>N</Required>
+                </basicAuthGroups>
                 <tuning_timeoutConnect type="TextField">
                     <mask>/^([0-9]{1,8}(?:us|ms|s|m|h|d)?)/u</mask>
                     <ValidationMessage>Should be a number between 1 and 8 characters, optionally followed by either "d", "h", "m", "s", "ms" or "us".</ValidationMessage>
@@ -834,6 +1109,20 @@
                     <default>0</default>
                     <Required>Y</Required>
                 </tuning_noport>
+                <tuning_httpreuse type="OptionField">
+                    <Required>N</Required>
+                    <default>safe</default>
+                    <OptionValues>
+                        <never>Never</never>
+                        <safe>Safe [default]</safe>
+                        <aggressive>Aggressive</aggressive>
+                        <always>Always</always>
+                    </OptionValues>
+                </tuning_httpreuse>
+                <tuning_caching type="BooleanField">
+                    <default>0</default>
+                    <Required>N</Required>
+                </tuning_caching>
                 <linkedActions type="ModelRelationField">
                     <Model>
                         <template>
@@ -843,6 +1132,7 @@
                         </template>
                     </Model>
                     <ValidationMessage>Related action item not found</ValidationMessage>
+                    <Sorted>Y</Sorted>
                     <multiple>Y</multiple>
                     <Required>N</Required>
                 </linkedActions>
@@ -865,8 +1155,12 @@
                 <id type="UniqueIdField">
                     <Required>Y</Required>
                 </id>
+                <enabled type="BooleanField">
+                    <default>1</default>
+                    <Required>Y</Required>
+                </enabled>
                 <name type="TextField">
-                    <mask>/^([0-9a-zA-Z._]){1,255}$/u</mask>
+                    <mask>/^([0-9a-zA-Z._\-]){1,255}$/u</mask>
                     <ValidationMessage>Should be a string between 1 and 255 characters.</ValidationMessage>
                     <Required>Y</Required>
                 </name>
@@ -913,7 +1207,8 @@
                 <sslCA type="CertificateField">
                     <Required>N</Required>
                     <Type>ca</Type>
-                    <ValidationMessage>Please select a valid CA from the list.</ValidationMessage>
+                    <Multiple>Y</Multiple>
+                    <ValidationMessage>Please select one or more CAs from the list.</ValidationMessage>
                 </sslCA>
                 <sslCRL type="CertificateField">
                     <Required>N</Required>
@@ -986,6 +1281,10 @@
                     <ValidationMessage>Should be a number between 1 and 8 characters, optionally followed by either "d", "h", "m", "s", "ms" or "us".</ValidationMessage>
                     <Required>Y</Required>
                 </interval>
+                <force_ssl type="BooleanField">
+                    <default>0</default>
+                    <Required>N</Required>
+                </force_ssl>
                 <checkport type="IntegerField">
                     <default></default>
                     <MinimumValue>1</MinimumValue>
@@ -1129,6 +1428,7 @@
                 <expression type="OptionField">
                     <Required>Y</Required>
                     <OptionValues>
+                        <http_auth>HTTP Basic Auth: username/password from client matches selected User/Group</http_auth>
                         <hdr_beg>Host starts with</hdr_beg>
                         <hdr_end>Host ends with</hdr_end>
                         <hdr>Host matches</hdr>
@@ -1141,7 +1441,6 @@
                         <path_dir>Path contains subdir</path_dir>
                         <path_sub>Path contains string</path_sub>
                         <url_param>URL parameter contains</url_param>
-                        <ssl_fc>SSL/TLS connection established</ssl_fc>
                         <ssl_c_verify>SSL Client certificate is valid</ssl_c_verify>
                         <ssl_c_verify_code>SSL Client certificate verify error result</ssl_c_verify_code>
                         <ssl_c_ca_commonname>SSL Client certificate issued by CA common-name</ssl_c_ca_commonname>
@@ -1164,16 +1463,18 @@
                         <src_http_req_cnt>Source IP: number of HTTP requests</src_http_req_cnt>
                         <src_http_req_rate>Source IP: rate of HTTP requests</src_http_req_rate>
                         <!-- <src_inc_gpc0>Source IP: increment the first General Purpose Counter</src_inc_gpc0> -->
-                        <src_sess_cnt>Source IP: cumulative number of connections</src_sess_cnt>
+                        <src_sess_cnt>Source IP: cumulative number of sessions</src_sess_cnt>
                         <src_sess_rate>Source IP: session rate</src_sess_rate>
                         <nbsrv>Minimum number of usable servers in backend</nbsrv>
                         <traffic_is_http>Traffic is HTTP</traffic_is_http>
-                        <traffic_is_ssl>Traffic is SSL</traffic_is_ssl>
-                        <ssl_sni>SNI TLS extension matches</ssl_sni>
-                        <ssl_sni_sub>SNI TLS extension contains</ssl_sni_sub>
-                        <ssl_sni_beg>SNI TLS extension starts with</ssl_sni_beg>
-                        <ssl_sni_end>SNI TLS extension ends with</ssl_sni_end>
-                        <ssl_sni_reg>SNI TLS extension regex</ssl_sni_reg>
+                        <traffic_is_ssl>Traffic is SSL (TCP request content inspection)</traffic_is_ssl>
+                        <ssl_fc>Traffic is SSL (locally deciphered)</ssl_fc>
+                        <ssl_fc_sni>SNI TLS extension matches (locally deciphered)</ssl_fc_sni>
+                        <ssl_sni>SNI TLS extension matches (TCP request content inspection)</ssl_sni>
+                        <ssl_sni_sub>SNI TLS extension contains (TCP request content inspection)</ssl_sni_sub>
+                        <ssl_sni_beg>SNI TLS extension starts with (TCP request content inspection)</ssl_sni_beg>
+                        <ssl_sni_end>SNI TLS extension ends with (TCP request content inspection)</ssl_sni_end>
+                        <ssl_sni_reg>SNI TLS extension regex (TCP request content inspection)</ssl_sni_reg>
                         <custom_acl>Custom condition (option pass-through)</custom_acl>
                     </OptionValues>
                 </expression>
@@ -1471,6 +1772,10 @@
                     <ValidationMessage>Related backend item not found</ValidationMessage>
                     <Required>N</Required>
                 </nbsrv_backend>
+                <ssl_fc_sni type="TextField">
+                    <mask>/^.{1,4096}$/u</mask>
+                    <Required>N</Required>
+                </ssl_fc_sni>
                 <ssl_sni type="TextField">
                     <mask>/^.{1,4096}$/u</mask>
                     <Required>N</Required>
@@ -1514,6 +1819,30 @@
                     <Required>N</Required>
                     <Required>N</Required>
                 </queryBackend>
+                <allowedUsers type="ModelRelationField">
+                    <Model>
+                        <template>
+                            <source>OPNsense.HAProxy.HAProxy</source>
+                            <items>users.user</items>
+                            <display>name</display>
+                        </template>
+                    </Model>
+                    <ValidationMessage>Related user not found</ValidationMessage>
+                    <multiple>Y</multiple>
+                    <Required>N</Required>
+                </allowedUsers>
+                <allowedGroups type="ModelRelationField">
+                    <Model>
+                        <template>
+                            <source>OPNsense.HAProxy.HAProxy</source>
+                            <items>groups.group</items>
+                            <display>name</display>
+                        </template>
+                    </Model>
+                    <ValidationMessage>Related group not found</ValidationMessage>
+                    <multiple>Y</multiple>
+                    <Required>N</Required>
+                </allowedGroups>
             </acl>
         </acls>
         <actions>
@@ -1561,6 +1890,7 @@
                     <OptionValues>
                         <use_backend>Use specified Backend Pool</use_backend>
                         <use_server>Override server in Backend Pool</use_server>
+                        <map_use_backend>Map domains to backend pools using a map file</map_use_backend>
                         <http-request_allow>http-request allow</http-request_allow>
                         <http-request_deny>http-request deny</http-request_deny>
                         <http-request_tarpit>http-request tarpit</http-request_tarpit>
@@ -1574,6 +1904,7 @@
                         <http-request_replace-header>http-request header replace</http-request_replace-header>
                         <http-request_replace-value>http-request header replace value</http-request_replace-value>
                         <http-request_set-path>http-request set-path</http-request_set-path>
+                        <http-request_set-var>http-request set-var</http-request_set-var>
                         <http-response_allow>http-response allow</http-response_allow>
                         <http-response_deny>http-response deny</http-response_deny>
                         <http-response_lua>http-response lua script</http-response_lua>
@@ -1582,17 +1913,20 @@
                         <http-response_del-header>http-response header delete</http-response_del-header>
                         <http-response_replace-header>http-response header replace</http-response_replace-header>
                         <http-response_replace-value>http-response header replace value</http-response_replace-value>
-                        <http-response_set-status>Set HTTP status code in response</http-response_set-status>
+                        <http-response_set-status>http-response set-status</http-response_set-status>
+                        <http-response_set-var>http-response set-var</http-response_set-var>
                         <tcp-request_connection_accept>tcp-request connection accept</tcp-request_connection_accept>
                         <tcp-request_connection_reject>tcp-request connection reject</tcp-request_connection_reject>
                         <tcp-request_content_accept>tcp-request content accept</tcp-request_content_accept>
                         <tcp-request_content_reject>tcp-request content reject</tcp-request_content_reject>
                         <tcp-request_content_lua>tcp-request content lua script</tcp-request_content_lua>
                         <tcp-request_content_use-service>tcp-request content use-service</tcp-request_content_use-service>
+                        <tcp-request_inspect-delay>tcp-request inspect-delay</tcp-request_inspect-delay>
                         <tcp-response_content_accept>tcp-response content accept</tcp-response_content_accept>
                         <tcp-response_content_close>tcp-response content close</tcp-response_content_close>
                         <tcp-response_content_reject>tcp-response content reject</tcp-response_content_reject>
                         <tcp-response_content_lua>tcp-response content lua script</tcp-response_content_lua>
+                        <tcp-response_inspect-delay>tcp-response inspect-delay</tcp-response_inspect-delay>
                         <custom>Custom rule (option pass-through)</custom>
                     </OptionValues>
                 </type>
@@ -1677,6 +2011,25 @@
                     <mask>/^.{1,4096}$/u</mask>
                     <Required>N</Required>
                 </http_request_set_path>
+                <http_request_set_var_scope type="OptionField">
+                    <Required>N</Required>
+                    <default>txn</default>
+                    <OptionValues>
+                        <proc>variable is shared with the whole process</proc>
+                        <sess>variable is shared with the whole session</sess>
+                        <txn>variable is shared with the transaction (request/response)</txn>
+                        <req>variable is shared only during request processing</req>
+                        <res>variable is shared only during response processing</res>
+                    </OptionValues>
+                </http_request_set_var_scope>
+                <http_request_set_var_name type="TextField">
+                    <mask>/^.{1,4096}$/u</mask>
+                    <Required>N</Required>
+                </http_request_set_var_name>
+                <http_request_set_var_expr type="TextField">
+                    <mask>/^.{1,4096}$/u</mask>
+                    <Required>N</Required>
+                </http_request_set_var_expr>
                 <http_response_lua type="TextField">
                     <mask>/^.{1,4096}$/u</mask>
                     <Required>N</Required>
@@ -1727,6 +2080,25 @@
                     <mask>/^.{1,4096}$/u</mask>
                     <Required>N</Required>
                 </http_response_set_status_reason>
+                <http_response_set_var_scope type="OptionField">
+                    <Required>N</Required>
+                    <default>txn</default>
+                    <OptionValues>
+                        <proc>variable is shared with the whole process</proc>
+                        <sess>variable is shared with the whole session</sess>
+                        <txn>variable is shared with the transaction (request/response)</txn>
+                        <req>variable is shared only during request processing</req>
+                        <res>variable is shared only during response processing</res>
+                    </OptionValues>
+                </http_response_set_var_scope>
+                <http_response_set_var_name type="TextField">
+                    <mask>/^.{1,4096}$/u</mask>
+                    <Required>N</Required>
+                </http_response_set_var_name>
+                <http_response_set_var_expr type="TextField">
+                    <mask>/^.{1,4096}$/u</mask>
+                    <Required>N</Required>
+                </http_response_set_var_expr>
                 <tcp_request_content_lua type="TextField">
                     <mask>/^.{1,4096}$/u</mask>
                     <Required>N</Required>
@@ -1735,10 +2107,18 @@
                     <mask>/^.{1,4096}$/u</mask>
                     <Required>N</Required>
                 </tcp_request_content_use_service>
+                <tcp_request_inspect_delay type="TextField">
+                    <mask>/^.{1,32}$/u</mask>
+                    <Required>N</Required>
+                </tcp_request_inspect_delay>
                 <tcp_response_content_lua type="TextField">
                     <mask>/^.{1,4096}$/u</mask>
                     <Required>N</Required>
                 </tcp_response_content_lua>
+                <tcp_response_inspect_delay type="TextField">
+                    <mask>/^.{1,32}$/u</mask>
+                    <Required>N</Required>
+                </tcp_response_inspect_delay>
                 <custom type="TextField">
                     <mask>/^.{1,4096}$/u</mask>
                     <Required>N</Required>
@@ -1777,6 +2157,30 @@
                 <actionValue type="TextField">
                      <Required>N</Required>
                 </actionValue>
+                <map_use_backend_file type="ModelRelationField">
+                    <Model>
+                        <template>
+                            <source>OPNsense.HAProxy.HAProxy</source>
+                            <items>mapfiles.mapfile</items>
+                            <display>name</display>
+                        </template>
+                    </Model>
+                    <ValidationMessage>Related map file item not found</ValidationMessage>
+                    <Multiple>N</Multiple>
+                    <Required>N</Required>
+                </map_use_backend_file>
+                <map_use_backend_default type="ModelRelationField">
+                    <Model>
+                        <template>
+                            <source>OPNsense.HAProxy.HAProxy</source>
+                            <items>backends.backend</items>
+                            <display>name</display>
+                        </template>
+                    </Model>
+                    <ValidationMessage>Related backend pool item not found</ValidationMessage>
+                    <Multiple>N</Multiple>
+                    <Required>N</Required>
+                </map_use_backend_default>
             </action>
         </actions>
         <luas>
@@ -1839,5 +2243,371 @@
                 </content>
             </errorfile>
         </errorfiles>
+        <mapfiles>
+            <mapfile type="ArrayField">
+                <id type="UniqueIdField">
+                    <Required>Y</Required>
+                </id>
+                <name type="TextField">
+                    <mask>/^[^\t^,^;^\.^\[^\]^\{^\}]{1,255}$/u</mask>
+                    <ValidationMessage>Should be a string between 1 and 255 characters.</ValidationMessage>
+                    <Required>Y</Required>
+                </name>
+                <description type="TextField">
+                    <mask>/^.{1,255}$/u</mask>
+                    <ValidationMessage>Should be a string between 1 and 255 characters.</ValidationMessage>
+                    <Required>N</Required>
+                </description>
+                <content type="TextField">
+                    <Required>Y</Required>
+                </content>
+            </mapfile>
+        </mapfiles>
+        <groups>
+            <group type="ArrayField">
+                <id type="UniqueIdField">
+                    <Required>Y</Required>
+                </id>
+                <enabled type="BooleanField">
+                    <default>1</default>
+                    <Required>Y</Required>
+                </enabled>
+                <name type="TextField">
+                    <mask>/^[^\t^,^;^\.^\[^\]^\{^\}]{1,255}$/u</mask>
+                    <ValidationMessage>Should be a string between 1 and 255 characters.</ValidationMessage>
+                    <Required>Y</Required>
+                </name>
+                <description type="TextField">
+                    <mask>/^.{1,255}$/u</mask>
+                    <ValidationMessage>Should be a string between 1 and 255 characters.</ValidationMessage>
+                    <Required>N</Required>
+                </description>
+                <members type="ModelRelationField">
+                    <Model>
+                        <template>
+                            <source>OPNsense.HAProxy.HAProxy</source>
+                            <items>users.user</items>
+                            <display>name</display>
+                        </template>
+                    </Model>
+                    <ValidationMessage>Related user not found</ValidationMessage>
+                    <Multiple>Y</Multiple>
+                    <Required>N</Required>
+                </members>
+                <add_userlist type="BooleanField">
+                    <default>0</default>
+                    <Required>N</Required>
+                </add_userlist>
+            </group>
+        </groups>
+        <users>
+            <user type="ArrayField">
+                <id type="UniqueIdField">
+                    <Required>Y</Required>
+                </id>
+                <enabled type="BooleanField">
+                    <default>1</default>
+                    <Required>Y</Required>
+                </enabled>
+                <name type="TextField">
+                    <mask>/^[^\t^,^;^\.^\[^\]^\{^\}]{1,255}$/u</mask>
+                    <ValidationMessage>Should be a string between 1 and 255 characters.</ValidationMessage>
+                    <Required>Y</Required>
+                </name>
+                <description type="TextField">
+                    <mask>/^.{1,255}$/u</mask>
+                    <ValidationMessage>Should be a string between 1 and 255 characters.</ValidationMessage>
+                    <Required>N</Required>
+                </description>
+                <password type="TextField">
+                    <mask>/^.{1,512}$/u</mask>
+                    <ValidationMessage>Should be a string between 1 and 512 characters.</ValidationMessage>
+                    <Required>Y</Required>
+                </password>
+            </user>
+        </users>
+        <cpus>
+            <cpu type="ArrayField">
+                <id type="UniqueIdField">
+                    <Required>Y</Required>
+                </id>
+                <enabled type="BooleanField">
+                    <default>1</default>
+                    <Required>Y</Required>
+                </enabled>
+                <name type="TextField">
+                    <mask>/^[^\t^,^;^\.^\[^\]^\{^\}]{1,255}$/u</mask>
+                    <ValidationMessage>Should be a string between 1 and 255 characters.</ValidationMessage>
+                    <Required>Y</Required>
+                </name>
+                <process_id type="OptionField">
+                    <Required>Y</Required>
+                    <OptionValues>
+                        <all>All HAProxy processes</all>
+                        <odd>Processes with odd ID</odd>
+                        <even>Processes with even ID</even>
+                        <x1>Process 1</x1>
+                        <x2>Process 2</x2>
+                        <x3>Process 3</x3>
+                        <x4>Process 4</x4>
+                        <x5>Process 5</x5>
+                        <x6>Process 6</x6>
+                        <x7>Process 7</x7>
+                        <x8>Process 8</x8>
+                        <x9>Process 9</x9>
+                        <x10>Process 10</x10>
+                        <x11>Process 11</x11>
+                        <x12>Process 12</x12>
+                        <x13>Process 13</x13>
+                        <x14>Process 14</x14>
+                        <x15>Process 15</x15>
+                        <x16>Process 16</x16>
+                        <x17>Process 17</x17>
+                        <x18>Process 18</x18>
+                        <x19>Process 19</x19>
+                        <x20>Process 20</x20>
+                        <x21>Process 21</x21>
+                        <x22>Process 22</x22>
+                        <x23>Process 23</x23>
+                        <x24>Process 24</x24>
+                        <x25>Process 25</x25>
+                        <x26>Process 26</x26>
+                        <x27>Process 27</x27>
+                        <x28>Process 28</x28>
+                        <x29>Process 29</x29>
+                        <x30>Process 30</x30>
+                        <x31>Process 31</x31>
+                        <x32>Process 32</x32>
+                        <x33>Process 33</x33>
+                        <x34>Process 34</x34>
+                        <x35>Process 35</x35>
+                        <x36>Process 36</x36>
+                        <x37>Process 37</x37>
+                        <x38>Process 38</x38>
+                        <x39>Process 39</x39>
+                        <x40>Process 40</x40>
+                        <x41>Process 41</x41>
+                        <x42>Process 42</x42>
+                        <x43>Process 43</x43>
+                        <x44>Process 44</x44>
+                        <x45>Process 45</x45>
+                        <x46>Process 46</x46>
+                        <x47>Process 47</x47>
+                        <x48>Process 48</x48>
+                        <x49>Process 49</x49>
+                        <x50>Process 50</x50>
+                        <x51>Process 51</x51>
+                        <x52>Process 52</x52>
+                        <x53>Process 53</x53>
+                        <x54>Process 54</x54>
+                        <x55>Process 55</x55>
+                        <x56>Process 56</x56>
+                        <x57>Process 57</x57>
+                        <x58>Process 58</x58>
+                        <x59>Process 59</x59>
+                        <x60>Process 60</x60>
+                        <x61>Process 61</x61>
+                        <x62>Process 62</x62>
+                        <x63>Process 63</x63>
+                    </OptionValues>
+                </process_id>
+                <thread_id type="OptionField">
+                    <Required>Y</Required>
+                    <OptionValues>
+                        <all>All HAProxy threads </all>
+                        <odd>Threads with odd ID</odd>
+                        <even>Threads with even ID</even>
+                        <x1>Thread 1</x1>
+                        <x2>Thread 2</x2>
+                        <x3>Thread 3</x3>
+                        <x4>Thread 4</x4>
+                        <x5>Thread 5</x5>
+                        <x6>Thread 6</x6>
+                        <x7>Thread 7</x7>
+                        <x8>Thread 8</x8>
+                        <x9>Thread 9</x9>
+                        <x10>Thread 10</x10>
+                        <x11>Thread 11</x11>
+                        <x12>Thread 12</x12>
+                        <x13>Thread 13</x13>
+                        <x14>Thread 14</x14>
+                        <x15>Thread 15</x15>
+                        <x16>Thread 16</x16>
+                        <x17>Thread 17</x17>
+                        <x18>Thread 18</x18>
+                        <x19>Thread 19</x19>
+                        <x20>Thread 20</x20>
+                        <x21>Thread 21</x21>
+                        <x22>Thread 22</x22>
+                        <x23>Thread 23</x23>
+                        <x24>Thread 24</x24>
+                        <x25>Thread 25</x25>
+                        <x26>Thread 26</x26>
+                        <x27>Thread 27</x27>
+                        <x28>Thread 28</x28>
+                        <x29>Thread 29</x29>
+                        <x30>Thread 30</x30>
+                        <x31>Thread 31</x31>
+                        <x32>Thread 32</x32>
+                        <x33>Thread 33</x33>
+                        <x34>Thread 34</x34>
+                        <x35>Thread 35</x35>
+                        <x36>Thread 36</x36>
+                        <x37>Thread 37</x37>
+                        <x38>Thread 38</x38>
+                        <x39>Thread 39</x39>
+                        <x40>Thread 40</x40>
+                        <x41>Thread 41</x41>
+                        <x42>Thread 42</x42>
+                        <x43>Thread 43</x43>
+                        <x44>Thread 44</x44>
+                        <x45>Thread 45</x45>
+                        <x46>Thread 46</x46>
+                        <x47>Thread 47</x47>
+                        <x48>Thread 48</x48>
+                        <x49>Thread 49</x49>
+                        <x50>Thread 50</x50>
+                        <x51>Thread 51</x51>
+                        <x52>Thread 52</x52>
+                        <x53>Thread 53</x53>
+                        <x54>Thread 54</x54>
+                        <x55>Thread 55</x55>
+                        <x56>Thread 56</x56>
+                        <x57>Thread 57</x57>
+                        <x58>Thread 58</x58>
+                        <x59>Thread 59</x59>
+                        <x60>Thread 60</x60>
+                        <x61>Thread 61</x61>
+                        <x62>Thread 62</x62>
+                        <x63>Thread 63</x63>
+                    </OptionValues>
+                </thread_id>
+                <cpu_id type="OptionField">
+                    <Required>Y</Required>
+                    <Multiple>Y</Multiple>
+                    <OptionValues>
+                        <all>All CPUs</all>
+                        <odd>CPUs with odd ID</odd>
+                        <even>CPUs with even ID</even>
+                        <x0>CPU 0</x0>
+                        <x1>CPU 1</x1>
+                        <x2>CPU 2</x2>
+                        <x3>CPU 3</x3>
+                        <x4>CPU 4</x4>
+                        <x5>CPU 5</x5>
+                        <x6>CPU 6</x6>
+                        <x7>CPU 7</x7>
+                        <x8>CPU 8</x8>
+                        <x9>CPU 9</x9>
+                        <x10>CPU 10</x10>
+                        <x11>CPU 11</x11>
+                        <x12>CPU 12</x12>
+                        <x13>CPU 13</x13>
+                        <x14>CPU 14</x14>
+                        <x15>CPU 15</x15>
+                        <x16>CPU 16</x16>
+                        <x17>CPU 17</x17>
+                        <x18>CPU 18</x18>
+                        <x19>CPU 19</x19>
+                        <x20>CPU 20</x20>
+                        <x21>CPU 21</x21>
+                        <x22>CPU 22</x22>
+                        <x23>CPU 23</x23>
+                        <x24>CPU 24</x24>
+                        <x25>CPU 25</x25>
+                        <x26>CPU 26</x26>
+                        <x27>CPU 27</x27>
+                        <x28>CPU 28</x28>
+                        <x29>CPU 29</x29>
+                        <x30>CPU 30</x30>
+                        <x31>CPU 31</x31>
+                        <x32>CPU 32</x32>
+                        <x33>CPU 33</x33>
+                        <x34>CPU 34</x34>
+                        <x35>CPU 35</x35>
+                        <x36>CPU 36</x36>
+                        <x37>CPU 37</x37>
+                        <x38>CPU 38</x38>
+                        <x39>CPU 39</x39>
+                        <x40>CPU 40</x40>
+                        <x41>CPU 41</x41>
+                        <x42>CPU 42</x42>
+                        <x43>CPU 43</x43>
+                        <x44>CPU 44</x44>
+                        <x45>CPU 45</x45>
+                        <x46>CPU 46</x46>
+                        <x47>CPU 47</x47>
+                        <x48>CPU 48</x48>
+                        <x49>CPU 49</x49>
+                        <x50>CPU 50</x50>
+                        <x51>CPU 51</x51>
+                        <x52>CPU 52</x52>
+                        <x53>CPU 53</x53>
+                        <x54>CPU 54</x54>
+                        <x55>CPU 55</x55>
+                        <x56>CPU 56</x56>
+                        <x57>CPU 57</x57>
+                        <x58>CPU 58</x58>
+                        <x59>CPU 59</x59>
+                        <x60>CPU 60</x60>
+                        <x61>CPU 61</x61>
+                        <x62>CPU 62</x62>
+                        <x63>CPU 63</x63>
+                    </OptionValues>
+                </cpu_id>
+            </cpu>
+        </cpus>
+        <resolvers>
+            <resolver type="ArrayField">
+                <id type="UniqueIdField">
+                    <Required>Y</Required>
+                </id>
+                <enabled type="BooleanField">
+                    <default>1</default>
+                    <Required>Y</Required>
+                </enabled>
+                <name type="TextField">
+                    <mask>/^[^\t^,^;^\.^\[^\]^\{^\}]{1,255}$/u</mask>
+                    <ValidationMessage>Should be a string between 1 and 255 characters.</ValidationMessage>
+                    <Required>Y</Required>
+                </name>
+                <description type="TextField">
+                    <Required>N</Required>
+                    <mask>/^.{1,255}$/u</mask>
+                    <ValidationMessage>Should be a string between 1 and 255 characters.</ValidationMessage>
+                </description>
+                <nameservers type="CSVListField">
+                    <Required>N</Required>
+                    <Sorted>Y</Sorted>
+                    <multiple>Y</multiple>
+                    <mask>/^((([0-9a-zA-Z._\-\*:\[\]]+:[0-9]+(-[0-9]+)?)([,]){0,1}))*/u</mask>
+                    <ChangeCase>lower</ChangeCase>
+                    <ValidationMessage>Please provide a valid nameserver address, i.e. 127.0.0.1:53, [::1]:53 or 192.168.1.1:53.</ValidationMessage>
+                </nameservers>
+                <parse_resolv_conf type="BooleanField">
+                    <default>0</default>
+                    <Required>Y</Required>
+                </parse_resolv_conf>
+                <resolve_retries type="IntegerField">
+                    <default>3</default>
+                    <MinimumValue>0</MinimumValue>
+                    <MaximumValue>100000</MaximumValue>
+                    <ValidationMessage>Please specify a value between 0 and 100000.</ValidationMessage>
+                    <Required>N</Required>
+                </resolve_retries>
+                <timeout_resolve type="TextField">
+                    <default>1s</default>
+                    <mask>/^([0-9]{1,8}(?:us|ms|s|m|h|d)?)/u</mask>
+                    <ValidationMessage>Should be a number between 1 and 8 characters, optionally followed by either "d", "h", "m", "s", "ms" or "us".</ValidationMessage>
+                    <Required>N</Required>
+                </timeout_resolve>
+                <timeout_retry type="TextField">
+                    <default>1s</default>
+                    <mask>/^([0-9]{1,8}(?:us|ms|s|m|h|d)?)/u</mask>
+                    <ValidationMessage>Should be a number between 1 and 8 characters, optionally followed by either "d", "h", "m", "s", "ms" or "us".</ValidationMessage>
+                    <Required>N</Required>
+                </timeout_retry>
+            </resolver>
+        </resolvers>
     </items>
 </model>

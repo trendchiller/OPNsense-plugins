@@ -1,4 +1,5 @@
 <?php
+
 /**
  *    Copyright (C) 2016-2017 Frank Wall
  *    Copyright (C) 2015 Deciso B.V.
@@ -27,6 +28,7 @@
  *    POSSIBILITY OF SUCH DAMAGE.
  *
  */
+
 namespace OPNsense\HAProxy;
 
 use OPNsense\Base\BaseModel;
@@ -46,7 +48,7 @@ class HAProxy extends BaseModel
     {
         if ((string)$this->general->enabled === "1") {
             if ($checkFrontends === true) {
-                foreach ($this->frontends->frontend->__items as $frontend) {
+                foreach ($this->frontends->frontend->iterateItems() as $frontend) {
                     if ((string)$frontend->enabled === "1") {
                         return true; // Found a active frontend
                     }
@@ -65,7 +67,7 @@ class HAProxy extends BaseModel
      */
     public function getByFrontendID($uuid)
     {
-        foreach ($this->frontends->frontend->__items as $frontend) {
+        foreach ($this->frontends->frontend->iterateItems() as $frontend) {
             if ((string)$uuid === (string)$frontend->getAttributes()["uuid"]) {
                 return $frontend;
             }
@@ -80,7 +82,7 @@ class HAProxy extends BaseModel
      */
     public function getByBackendID($uuid)
     {
-        foreach ($this->backends->backend->__items as $backend) {
+        foreach ($this->backends->backend->iterateItems() as $backend) {
             if ((string)$uuid === (string)$backend->getAttributes()["uuid"]) {
                 return $backend;
             }
@@ -95,7 +97,7 @@ class HAProxy extends BaseModel
      */
     public function getByServerID($uuid)
     {
-        foreach ($this->servers->server->__items as $server) {
+        foreach ($this->servers->server->iterateItems() as $server) {
             if ((string)$uuid === (string)$server->getAttributes()["uuid"]) {
                 return $server;
             }
@@ -110,7 +112,7 @@ class HAProxy extends BaseModel
      */
     public function getByActionID($uuid)
     {
-        foreach ($this->actions->action->__items as $action) {
+        foreach ($this->actions->action->iterateItems() as $action) {
             if ((string)$uuid === (string)$action->getAttributes()["uuid"]) {
                 return $action;
             }
@@ -125,7 +127,7 @@ class HAProxy extends BaseModel
      */
     public function getByAclID($uuid)
     {
-        foreach ($this->acls->acl->__items as $acl) {
+        foreach ($this->acls->acl->iterateItems() as $acl) {
             if ((string)$uuid === (string)$acl->getAttributes()["uuid"]) {
                 return $acl;
             }

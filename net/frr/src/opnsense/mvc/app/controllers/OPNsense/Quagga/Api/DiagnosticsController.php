@@ -1,7 +1,8 @@
 <?php
+
 /**
  *    Copyright (C) 2017 Frank Wall
- *    Copyright (C) 2017 Michael Muenz
+ *    Copyright (C) 2017 Michael Muenz <m.muenz@gmail.com>
  *
  *    All rights reserved.
  *
@@ -30,9 +31,9 @@
 
 namespace OPNsense\Quagga\Api;
 
-use \OPNsense\Base\ApiControllerBase;
-use \OPNsense\Core\Backend;
-use \OPNsense\Core\Config;
+use OPNsense\Base\ApiControllerBase;
+use OPNsense\Core\Backend;
+use OPNsense\Core\Config;
 
 /**
  * Class DiagnosticsController
@@ -127,10 +128,6 @@ class DiagnosticsController extends ApiControllerBase
     public function generalroutesAction()
     {
         return $this->get_general_information('routes');
-    }
-    public function logAction()
-    {
-        return $this->get_general_information('log')['response']['general_log'];
     }
     public function generalroutes6Action()
     {

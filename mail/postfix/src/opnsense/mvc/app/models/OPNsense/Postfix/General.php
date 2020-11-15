@@ -1,10 +1,11 @@
 <?php
+
 namespace OPNsense\Postfix;
 
 use OPNsense\Base\BaseModel;
 
 /*
-    Copyright (C) 2017 Michael Muenz
+    Copyright (C) 2017 Michael Muenz <m.muenz@gmail.com>
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without

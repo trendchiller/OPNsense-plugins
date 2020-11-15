@@ -1,6 +1,7 @@
 <?php
+
 /**
- *    Copyright (C) 2018 Michael Muenz
+ *    Copyright (C) 2018 Michael Muenz <m.muenz@gmail.com>
  *
  *    All rights reserved.
  *
@@ -29,12 +30,12 @@
 
 namespace OPNsense\Netsnmp\Api;
 
-use \OPNsense\Base\ApiMutableModelControllerBase;
+use OPNsense\Base\ApiMutableModelControllerBase;
 
 class UserController extends ApiMutableModelControllerBase
 {
-    static protected $internalModelName = 'user';
-    static protected $internalModelClass = '\OPNsense\Netsnmp\User';
+    protected static $internalModelName = 'user';
+    protected static $internalModelClass = '\OPNsense\Netsnmp\User';
 
     public function searchUserAction()
     {

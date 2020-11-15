@@ -28,12 +28,12 @@
 
 namespace OPNsense\Tor\Api;
 
-use \OPNsense\Base\ApiMutableModelControllerBase;
+use OPNsense\Base\ApiMutableModelControllerBase;
 
 class HiddenserviceaclController extends ApiMutableModelControllerBase
 {
-    static protected $internalModelName = 'hiddenserviceacl';
-    static protected $internalModelClass = '\OPNsense\Tor\HiddenServiceACL';
+    protected static $internalModelName = 'hiddenserviceacl';
+    protected static $internalModelClass = '\OPNsense\Tor\HiddenServiceACL';
     public function searchaclAction()
     {
         return $this->searchBase('hiddenserviceacl', array('enabled', 'hiddenservice', 'port', 'target_host', 'target_port'));

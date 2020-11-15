@@ -3,7 +3,7 @@
 function show_wake_result(data) {
   BootstrapDialog.show({
     type: data.status == 'OK' ? BootstrapDialog.TYPE_SUCCESS : BootstrapDialog.TYPE_DANGER,
-    title: "{{ lang._("Result") }}",
+    title: "{{ lang._('Result') }}",
     message: (data.status == 'OK' ?
               '{{ lang._('Magic packet was sent successfully.') }}' :
               '{{ lang._('The packet was not sent due to an error. Please consult the logs.') }}<br />' +
@@ -25,7 +25,7 @@ $( document ).ready(function() {
       $.post('/api/wol/wol/wakeall', {}, function(data) {
           BootstrapDialog.show({
               type: BootstrapDialog.TYPE_INFO,
-              title: "{{ lang._("Result") }}",
+              title: "{{ lang._('Result') }}",
               message: '<ul>' + (data['results'].map(function(element) {
                   return `<li>${element.mac}: ${element.status}</li>`
               }).join('')) + '</ul>',
@@ -71,7 +71,7 @@ $( document ).ready(function() {
 });
 
 function msg_not_successful(wolent) {
-    return '{{ lang._('Please check the %ssystem log%s, the wol command for %s (%s) did not complete successfully.') | format( '<a href="/diag_logs.php">', '</a>', '%s', '%s') }}'
+    return '{{ lang._('Please check the %ssystem log%s, the wol command for %s (%s) did not complete successfully.') | format( '<a href="/ui/diagnostics/log/core/system">', '</a>', '%s', '%s') }}'
     .replace('%s', wolent['descr']).replace('%s',$('<pre>').text(wolent['mac']).html());
 }
 function msg_successful(wolent) {

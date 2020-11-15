@@ -29,11 +29,22 @@
 namespace OPNsense\Nginx\Api;
 
 use OPNsense\Base\ApiMutableModelControllerBase;
+use OPNsense\Core\Backend;
 
 class SettingsController extends ApiMutableModelControllerBase
 {
-    static protected $internalModelClass = '\OPNsense\Nginx\Nginx';
-    static protected $internalModelName = 'nginx';
+    protected static $internalModelClass = '\OPNsense\Nginx\Nginx';
+    protected static $internalModelName = 'nginx';
+
+    // download rules
+    public function downloadrulesAction()
+    {
+        if (!$this->request->isPost()) {
+            return array('error' => 'Must be called via POST');
+        }
+        $backend = new Backend();
+        return array('result' => trim($backend->configdRun('nginx naxsidownloadrules')));
+    }
 
     // User List
 
@@ -120,7 +131,7 @@ class SettingsController extends ApiMutableModelControllerBase
     // Upstream Server
     public function searchupstreamserverAction()
     {
-        return $this->searchBase('upstream_server', array('description', 'server', 'priority'));
+        return $this->searchBase('upstream_server', array('description', 'server', 'port', 'priority'));
     }
 
     public function getupstreamserverAction($uuid = null)
@@ -147,7 +158,7 @@ class SettingsController extends ApiMutableModelControllerBase
     // Location
     public function searchlocationAction()
     {
-        return $this->searchBase('location', array('description','urlpattern', 'matchtype', 'enable_secrules', 'force_https'));
+        return $this->searchBase('location', array('description','urlpattern', 'path_prefix', 'matchtype', 'enable_secrules', 'force_https'));
     }
 
     public function getlocationAction($uuid = null)
@@ -225,10 +236,37 @@ class SettingsController extends ApiMutableModelControllerBase
         return $this->setBase('httpserver', 'http_server', $uuid);
     }
 
+    // stream server
+    public function searchstreamserverAction()
+    {
+        return $this->searchBase('stream_server', array('description', 'certificate', 'udp', 'listen_port'));
+    }
+
+    public function getstreamserverAction($uuid = null)
+    {
+        $this->sessionClose();
+        return $this->getBase('streamserver', 'stream_server', $uuid);
+    }
+
+    public function addstreamserverAction()
+    {
+        return $this->addBase('streamserver', 'stream_server');
+    }
+
+    public function delstreamserverAction($uuid)
+    {
+        return $this->delBase('stream_server', $uuid);
+    }
+
+    public function setstreamserverAction($uuid)
+    {
+        return $this->setBase('streamserver', 'stream_server', $uuid);
+    }
+
     // naxsi rules
     public function searchnaxsiruleAction()
     {
-        return $this->searchBase('naxsi_rule', array('description', 'ruletype', 'message'));
+        return $this->searchBase('naxsi_rule', array('description', 'identifier', 'ruletype', 'message'));
     }
 
     public function getnaxsiruleAction($uuid = null)
@@ -304,5 +342,351 @@ class SettingsController extends ApiMutableModelControllerBase
     public function setsecurity_headerAction($uuid)
     {
         return $this->setBase('security_header', 'security_header', $uuid);
+    }
+
+    // access limit zone headers
+    public function searchlimit_zoneAction()
+    {
+        return $this->searchBase(
+            'limit_zone',
+            array('description', 'key', 'size', 'rate', 'rate_unit')
+        );
+    }
+
+    public function getlimit_zoneAction($uuid = null)
+    {
+        $this->sessionClose();
+        return $this->getBase('limit_zone', 'limit_zone', $uuid);
+    }
+
+    public function addlimit_zoneAction()
+    {
+        return $this->addBase('limit_zone', 'limit_zone');
+    }
+
+    public function dellimit_zoneAction($uuid)
+    {
+        return $this->delBase('limit_zone', $uuid);
+    }
+
+    public function setlimit_zoneAction($uuid)
+    {
+        return $this->setBase('limit_zone', 'limit_zone', $uuid);
+    }
+
+    // TLS fingerprints for MITM detection
+    public function searchtls_fingerprintAction()
+    {
+        return $this->searchBase('tls_fingerprint', array('description'));
+    }
+
+    public function gettls_fingerprintAction($uuid = null)
+    {
+        $this->sessionClose();
+        return $this->getBase('tls_fingerprint', 'tls_fingerprint', $uuid);
+    }
+
+    public function addtls_fingerprintAction()
+    {
+        return $this->addBase('tls_fingerprint', 'tls_fingerprint');
+    }
+
+    public function deltls_fingerprintAction($uuid)
+    {
+        return $this->delBase('tls_fingerprint', $uuid);
+    }
+
+    public function settls_fingerprintAction($uuid)
+    {
+        return $this->setBase('tls_fingerprint', 'tls_fingerprint', $uuid);
+    }
+
+    // limit_request_connection
+    public function searchlimit_request_connectionAction()
+    {
+        return $this->searchBase(
+            'limit_request_connection',
+            array('description', 'limit_zone', 'nodelay', 'burst', 'connection_count')
+        );
+    }
+
+    public function getlimit_request_connectionAction($uuid = null)
+    {
+        $this->sessionClose();
+        return $this->getBase('limit_request_connection', 'limit_request_connection', $uuid);
+    }
+
+    public function addlimit_request_connectionAction()
+    {
+        return $this->addBase('limit_request_connection', 'limit_request_connection');
+    }
+
+    public function dellimit_request_connectionAction($uuid)
+    {
+        return $this->delBase('limit_request_connection', $uuid);
+    }
+
+    public function setlimit_request_connectionAction($uuid)
+    {
+        return $this->setBase('limit_request_connection', 'limit_request_connection', $uuid);
+    }
+    // cache path
+    public function searchcache_pathAction()
+    {
+        return $this->searchBase(
+            'cache_path',
+            array('path', 'inactive', 'size', 'max_size')
+        );
+    }
+
+    public function getcache_pathAction($uuid = null)
+    {
+        $this->sessionClose();
+        return $this->getBase('cache_path', 'cache_path', $uuid);
+    }
+
+    public function addcache_pathAction()
+    {
+        return $this->addBase('cache_path', 'cache_path');
+    }
+
+    public function delcache_pathAction($uuid)
+    {
+        return $this->delBase('cache_path', $uuid);
+    }
+
+    public function setcache_pathAction($uuid)
+    {
+        return $this->setBase('cache_path', 'cache_path', $uuid);
+    }
+
+    // SNI Forward
+    public function searchsnifwdAction()
+    {
+        return $this->searchBase('sni_hostname_upstream_map', array('description'));
+    }
+
+    public function getsnifwdAction($uuid = null)
+    {
+        $this->sessionClose();
+        $base = $this->getBase('snihostname', 'sni_hostname_upstream_map', $uuid);
+        return $this->convert_sni_fwd_for_client($base);
+    }
+
+    public function addsnifwdAction()
+    {
+        if ($this->request->isPost()) {
+            $this->regenerate_hostname_map(null);
+            return $this->addBase('snihostname', 'sni_hostname_upstream_map');
+        }
+        return [];
+    }
+
+    public function delsnifwdAction($uuid)
+    {
+        $nginx = $this->getModel();
+        $uuid_attached = $nginx->find_sni_hostname_upstream_map_entry_uuids($uuid);
+
+        $ret = $this->delBase('sni_hostname_upstream_map', $uuid);
+        if ($ret['result'] == 'deleted') {
+            foreach ($uuid_attached as $old_uuid) {
+                $this->delBase('sni_hostname_upstream_map_item', $old_uuid);
+            }
+        }
+        return $ret;
+    }
+
+    public function setsnifwdAction($uuid)
+    {
+        if ($this->request->isPost()) {
+            $this->regenerate_hostname_map($uuid);
+            return $this->setBase('snihostname', 'sni_hostname_upstream_map', $uuid);
+        }
+        return [];
+    }
+
+    // IP / Network based ACLs
+    public function searchipaclAction()
+    {
+        return $this->searchBase('ip_acl', array('description'));
+    }
+
+    public function getipaclAction($uuid = null)
+    {
+        $this->sessionClose();
+        $base = $this->getBase('ipacl', 'ip_acl', $uuid);
+        return $this->convert_ipacl_for_client($base);
+    }
+
+    public function addipaclAction()
+    {
+        if ($this->request->isPost()) {
+            $this->regenerate_ipacl(null);
+            return $this->addBase('ipacl', 'ip_acl');
+        }
+        return [];
+    }
+
+    public function delipaclAction($uuid)
+    {
+        $nginx = $this->getModel();
+        $uuid_attached = $nginx->find_ip_acl_uuids($uuid);
+
+        $ret = $this->delBase('ip_acl', $uuid);
+        if ($ret['result'] == 'deleted') {
+            foreach ($uuid_attached as $old_uuid) {
+                $this->delBase('ip_acl_item', $old_uuid);
+            }
+        }
+        return $ret;
+    }
+
+    public function setipaclAction($uuid)
+    {
+        if ($this->request->isPost()) {
+            $this->regenerate_ipacl($uuid);
+            return $this->setBase('ipacl', 'ip_acl', $uuid);
+        }
+        return [];
+    }
+    /*
+     * worker code starts here
+     */
+
+    private function convert_sni_fwd_for_client($response_data)
+    {
+        if (!isset($response_data['snihostname']['data'])) {
+            return $response_data;
+        }
+        $nginx = $this->getModel();
+        $uuids_map = explode(',', $response_data['snihostname']['data']);
+        $response_data['snihostname']['data'] = [];
+        foreach ($uuids_map as $uuid_line) {
+            $rowdata = $nginx->getNodeByReference('sni_hostname_upstream_map_item.' . $uuid_line);
+            if ($rowdata != null) {
+                $response_data['snihostname']['data'][] =
+                    array('hostname' => (string)$rowdata->hostname,
+                        'upstream' => (string)$rowdata->upstream);
+            }
+        }
+        return $response_data;
+    }
+    private function convert_ipacl_for_client($response_data)
+    {
+        if (!isset($response_data['ipacl']['data'])) {
+            return $response_data;
+        }
+        $nginx = $this->getModel();
+        $uuids_map = explode(',', $response_data['ipacl']['data']);
+        $response_data['ipacl']['data'] = [];
+        foreach ($uuids_map as $uuid_line) {
+            $rowdata = $nginx->getNodeByReference('ip_acl_item.' . $uuid_line);
+            if ($rowdata != null) {
+                $response_data['ipacl']['data'][] =
+                    array('network' => (string)$rowdata->network,
+                        'action' => (string)$rowdata->action);
+            }
+        }
+        return $response_data;
+    }
+
+    /**
+     * @param null $uuid the uuid which should get cleared before
+     * @throws \ReflectionException if the model was not found
+     * @throws \Phalcon\Validation\Exception on validation errors
+     */
+    private function regenerate_hostname_map($uuid = null)
+    {
+        $nginx = $this->getModel();
+        if ($this->request->hasPost('snihostname') && is_array($_POST['snihostname']['data'])) {
+            if ($uuid != null) {
+                // for an update, we have to clear it.
+                $this->delete_uuids(
+                    $nginx->find_sni_hostname_upstream_map_entry_uuids($uuid),
+                    'sni_hostname_upstream_map_item'
+                );
+            }
+            $ids = [];
+            $postdata = $_POST['snihostname']['data'];
+            foreach ($postdata as $post_item) {
+                $item = $nginx->sni_hostname_upstream_map_item->Add();
+                $ids[] = $item->getAttributes()['uuid'];
+                $item->hostname = $post_item['hostname'];
+                $item->upstream = $post_item['upstream'];
+            }
+            $nginx->serializeToConfig();
+            $_POST['snihostname']['data'] = implode(',', $ids);
+        }
+    }
+
+    /**
+     * @param null $uuid the uuid which should get cleared before
+     * @throws \ReflectionException if the model was not found
+     * @throws \Phalcon\Validation\Exception on validation errors
+     */
+    private function regenerate_ipacl($uuid = null)
+    {
+        $nginx = $this->getModel();
+        if ($this->request->hasPost('ipacl') && is_array($_POST['ipacl']['data'])) {
+            if ($uuid != null) {
+                // for an update, we have to clear it.
+                $this->delete_uuids(
+                    $nginx->find_ip_acl_uuids($uuid),
+                    'ip_acl_item'
+                );
+            }
+            $ids = [];
+            $postdata = $_POST['ipacl']['data'];
+            foreach ($postdata as $post_item) {
+                $item = $nginx->ip_acl_item->Add();
+                $ids[] = $item->getAttributes()['uuid'];
+                $item->network = $post_item['network'];
+                $item->action = $post_item['action'];
+            }
+            $nginx->serializeToConfig();
+            $_POST['ipacl']['data'] = implode(',', $ids);
+        }
+    }
+
+    /**
+     * @param $uuids array list of UUIDs
+     * @param $path string the model prefix from the element to delete
+     * @throws \Phalcon\Validation\Exception
+     */
+    private function delete_uuids($uuids, $path): void
+    {
+        foreach ($uuids as $item_uuid) {
+            try {
+                $this->delBase($path, $item_uuid);
+            } catch (\Exception $e) {
+                // we don't care about then.
+            }
+        }
+    }
+    // SYSLOG targets
+    public function searchsyslog_targetAction()
+    {
+        return $this->searchBase('syslog_target', array('description', 'host', 'facility', 'severity'));
+    }
+
+    public function getsyslog_targetAction($uuid = null)
+    {
+        $this->sessionClose();
+        return $this->getBase('syslog_target', 'syslog_target', $uuid);
+    }
+
+    public function addsyslog_targetAction()
+    {
+        return $this->addBase('syslog_target', 'syslog_target');
+    }
+
+    public function delsyslog_targetAction($uuid)
+    {
+        return $this->delBase('syslog_target', $uuid);
+    }
+
+    public function setsyslog_targetAction($uuid)
+    {
+        return $this->setBase('syslog_target', 'syslog_target', $uuid);
     }
 }

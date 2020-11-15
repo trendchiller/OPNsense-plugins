@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (C) 2017 Michael Muenz
+ * Copyright (C) 2017 Michael Muenz <m.muenz@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,6 +33,7 @@ class UserController extends \OPNsense\Base\IndexController
     public function indexAction()
     {
         $this->view->formDialogEditFreeRADIUSUser = $this->getForm("dialogEditFreeRADIUSUser");
+        $this->view->formDialogEditFreeRADIUSAvpair = $this->getForm("dialogEditFreeRADIUSAvpair");
         $this->view->pick('OPNsense/Freeradius/user');
     }
 }

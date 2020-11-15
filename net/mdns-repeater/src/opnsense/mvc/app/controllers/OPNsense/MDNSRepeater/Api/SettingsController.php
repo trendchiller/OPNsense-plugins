@@ -30,10 +30,10 @@
 
 namespace OPNsense\MDNSRepeater\Api;
 
-use \OPNsense\Base\ApiMutableModelControllerBase;
+use OPNsense\Base\ApiMutableModelControllerBase;
 
 class SettingsController extends ApiMutableModelControllerBase
 {
-    static protected $internalModelClass = '\OPNsense\MDNSRepeater\MDNSRepeater';
-    static protected $internalModelName = 'mdnsrepeater';
+    protected static $internalModelClass = '\OPNsense\MDNSRepeater\MDNSRepeater';
+    protected static $internalModelName = 'mdnsrepeater';
 }

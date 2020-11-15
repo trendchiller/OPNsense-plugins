@@ -19,19 +19,27 @@
                 <type>text</type>
                 <help>Set a name for your UPS.</help>
             </field>
+            <field>
+                <id>nut.general.listen</id>
+                <label>Listen Address</label>
+                <style>tokenize</style>
+                <type>select_multiple</type>
+                <allownew>true</allownew>
+                <help>Set the addresses this service listen on.</help>
+            </field>
         </subtab>
         <subtab id="nut-general-account" description="Nut Account Settings">
             <field>
                 <id>nut.account.admin_password</id>
                 <label>Admin Password</label>
                 <type>text</type>
-                <help>Set the admin password.</help>
+                <help>Set the password for admin user "admin".</help>
             </field>
             <field>
                 <id>nut.account.mon_password</id>
                 <label>Monitor Password</label>
                 <type>text</type>
-                <help>Set the monitor password.</help>
+                <help>Set the password for monitoring user "monuser".</help>
             </field>
         </subtab>
     </tab>
@@ -46,7 +54,9 @@
             <field>
                 <id>nut.usbhid.args</id>
                 <label>Extra Arguments</label>
-                <type>text</type>
+                <style>tokenize</style>
+                <type>select_multiple</type>
+                <allownew>true</allownew>
                 <help>Set extra arguments for this UPS, e.g. "port=auto".</help>
             </field>
         </subtab>
@@ -60,7 +70,57 @@
             <field>
                 <id>nut.apcsmart.args</id>
                 <label>Extra Arguments</label>
-                <type>text</type>
+                <style>tokenize</style>
+                <type>select_multiple</type>
+                <allownew>true</allownew>
+                <help>Set extra arguments for this UPS, e.g. "port=auto".</help>
+            </field>
+        </subtab>
+        <subtab id="nut-ups-bcmxcpusb" description="BCMXCPUSB-Driver">
+            <field>
+                <id>nut.bcmxcpusb.enable</id>
+                <label>Enable</label>
+                <type>checkbox</type>
+                <help>Enable the PowerWare BCMXCPUSB driver.</help>
+            </field>
+            <field>
+                <id>nut.bcmxcpusb.args</id>
+                <label>Extra Arguments</label>
+                <style>tokenize</style>
+                <type>select_multiple</type>
+                <allownew>true</allownew>
+                <help>Set extra arguments for this UPS, e.g. "port=auto".</help>
+            </field>
+        </subtab>
+        <subtab id="nut-ups-blazerusb" description="BlazerUSB-Driver">
+            <field>
+                <id>nut.blazerusb.enable</id>
+                <label>Enable</label>
+                <type>checkbox</type>
+                <help>Enable the BlazerUSB driver.</help>
+            </field>
+            <field>
+                <id>nut.blazerusb.args</id>
+                <label>Extra Arguments</label>
+                <style>tokenize</style>
+                <type>select_multiple</type>
+                <allownew>true</allownew>
+                <help>Set extra arguments for this UPS, e.g. "port=auto".</help>
+            </field>
+        </subtab>
+        <subtab id="nut-ups-blazerser" description="BlazerSerial-Driver">
+            <field>
+                <id>nut.blazerser.enable</id>
+                <label>Enable</label>
+                <type>checkbox</type>
+                <help>Enable the BlazerSerial driver. Please be aware that this driver needs to run nut-tools as root.</help>
+            </field>
+            <field>
+                <id>nut.blazerser.args</id>
+                <label>Extra Arguments</label>
+                <style>tokenize</style>
+                <type>select_multiple</type>
+                <allownew>true</allownew>
                 <help>Set extra arguments for this UPS, e.g. "port=auto".</help>
             </field>
         </subtab>
@@ -88,6 +148,54 @@
                 <label>Password</label>
                 <type>password</type>
                 <help>Set the password of the remote NUT server.</help>
+            </field>
+        </subtab>
+        <subtab id="nut-ups-qx" description="QX-Driver">
+            <field>
+                <id>nut.qx.enable</id>
+                <label>Enable</label>
+                <type>checkbox</type>
+                <help>Enable the QX driver.</help>
+            </field>
+            <field>
+                <id>nut.qx.args</id>
+                <label>Extra Arguments</label>
+                <style>tokenize</style>
+                <type>select_multiple</type>
+                <allownew>true</allownew>
+                <help>Set extra arguments for this UPS, e.g. "port=auto".</help>
+            </field>
+        </subtab>
+        <subtab id="nut-ups-riello" description="Riello-Driver">
+            <field>
+                <id>nut.riello.enable</id>
+                <label>Enable</label>
+                <type>checkbox</type>
+                <help>Enable the Riello driver.</help>
+            </field>
+            <field>
+                <id>nut.riello.args</id>
+                <label>Extra Arguments</label>
+                <style>tokenize</style>
+                <type>select_multiple</type>
+                <allownew>true</allownew>
+                <help>Set extra arguments for this UPS, e.g. "port=auto".</help>
+            </field>
+        </subtab>
+        <subtab id="nut-ups-snmp" description="SNMP-Driver">
+            <field>
+                <id>nut.snmp.enable</id>
+                <label>Enable</label>
+                <type>checkbox</type>
+                <help>Enable the SNMP driver.</help>
+            </field>
+            <field>
+                <id>nut.snmp.args</id>
+                <label>Extra Arguments</label>
+                <style>tokenize</style>
+                <type>select_multiple</type>
+                <allownew>true</allownew>
+                <help>Set extra arguments for this UPS, e.g. "community=public".</help>
             </field>
         </subtab>
     </tab>

@@ -5,3 +5,16 @@ and Solar Controllers.
 
 NUT provides many control and monitoring features, with a uniform control
 and management interface.
+
+Plugin Changelog
+----------------
+
+1.7
+
+* Add PowerWare bcmxcp_usb driver
+
+1.6
+
+* Add QX driver support
+* Add snmp-ups driver support
+* Fixed permissions in blazer_ser driver

@@ -1,4 +1,4 @@
-# Copyright (c) 2015-2018 Franco Fichtner <franco@opnsense.org>
+# Copyright (c) 2015-2020 Franco Fichtner <franco@opnsense.org>
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -23,13 +23,13 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
 
-PAGER?=		less
-
 all:
 	@cat ${.CURDIR}/README.md | ${PAGER}
 
+.include "Mk/defaults.mk"
+
 CATEGORIES=	benchmarks databases devel dns mail misc net-mgmt \
-		net security sysutils www
+		net security sysutils vendor www
 
 .for CATEGORY in ${CATEGORIES}
 _${CATEGORY}!=	ls -1d ${CATEGORY}/*
@@ -38,7 +38,8 @@ PLUGIN_DIRS+=	${_${CATEGORY}}
 
 list:
 .for PLUGIN_DIR in ${PLUGIN_DIRS}
-	@echo ${PLUGIN_DIR} -- $$(${MAKE} -C ${PLUGIN_DIR} -V PLUGIN_COMMENT)
+	@echo ${PLUGIN_DIR} -- $$(${MAKE} -C ${PLUGIN_DIR} -V PLUGIN_COMMENT) \
+	    $$(if [ -n "$$(${MAKE} -C ${PLUGIN_DIR} -V PLUGIN_DEVEL _PLUGIN_DEVEL=)" ]; then echo "(development only)"; fi)
 .endfor
 
 # shared targets that are sane to run from the root directory
@@ -47,6 +48,7 @@ TARGETS=	clean lint style style-fix style-python sweep test
 .for TARGET in ${TARGETS}
 ${TARGET}:
 .  for PLUGIN_DIR in ${PLUGIN_DIRS}
+	@echo ">>> Entering ${PLUGIN_DIR}"
 	@${MAKE} -C ${PLUGIN_DIR} ${TARGET}
 .  endfor
 .endfor
@@ -54,4 +56,9 @@ ${TARGET}:
 license:
 	@${.CURDIR}/Scripts/license . > ${.CURDIR}/LICENSE
 
-.PHONY: license
+readme.md:
+	@MAKE=${MAKE} Scripts/update-list.sh
+
+sync: readme.md license
+
+.PHONY: license readme.md sync

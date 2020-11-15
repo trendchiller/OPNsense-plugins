@@ -1,4 +1,5 @@
 <?php
+
 /**
  *    Copyright (C) 2016 Frank Wall
  *    Copyright (C) 2015 Deciso B.V.
@@ -27,11 +28,12 @@
  *    POSSIBILITY OF SUCH DAMAGE.
  *
  */
+
 namespace OPNsense\HAProxy\Api;
 
-use \OPNsense\Base\ApiMutableServiceControllerBase;
-use \OPNsense\Core\Backend;
-use \OPNsense\HAProxy\HAProxy;
+use OPNsense\Base\ApiMutableServiceControllerBase;
+use OPNsense\Core\Backend;
+use OPNsense\HAProxy\HAProxy;
 
 /**
  * Class ServiceController
@@ -39,10 +41,10 @@ use \OPNsense\HAProxy\HAProxy;
  */
 class ServiceController extends ApiMutableServiceControllerBase
 {
-    static protected $internalServiceClass = '\OPNsense\HAProxy\HAProxy';
-    static protected $internalServiceTemplate = 'OPNsense/Haproxy';
-    static protected $internalServiceEnabled = 'general.enabled';
-    static protected $internalServiceName = 'haproxy';
+    protected static $internalServiceClass = '\OPNsense\HAProxy\HAProxy';
+    protected static $internalServiceTemplate = 'OPNsense/HAProxy';
+    protected static $internalServiceEnabled = 'general.enabled';
+    protected static $internalServiceName = 'haproxy';
 
     /**
      * run syntax check for haproxy configuration
@@ -59,5 +61,13 @@ class ServiceController extends ApiMutableServiceControllerBase
         // finally run the syntax check
         $response = $backend->configdRun("haproxy configtest");
         return array("result" => $response);
+    }
+
+    /**
+     * reconfigure force restart check, return zero for soft-reload
+     */
+    protected function reconfigureForceRestart()
+    {
+        return 0;
     }
 }

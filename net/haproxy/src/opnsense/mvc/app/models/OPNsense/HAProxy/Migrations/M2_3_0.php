@@ -1,4 +1,5 @@
 <?php
+
 /**
  *    Copyright (C) 2018 Frank Wall
  *
@@ -26,6 +27,7 @@
  *    POSSIBILITY OF SUCH DAMAGE.
  *
  */
+
 namespace OPNsense\HAProxy\Migrations;
 
 use OPNsense\Base\BaseModelMigration;
@@ -35,7 +37,7 @@ class M2_3_0 extends BaseModelMigration
     public function run($model)
     {
         // Persistence is a separate option now.
-        foreach ($model->getNodeByReference('backends.backend')->__items as $backend) {
+        foreach ($model->getNodeByReference('backends.backend')->iterateItems() as $backend) {
             if (isset($backend->stickiness_pattern)) {
                   $backend->persistence = 'sticktable';
             }

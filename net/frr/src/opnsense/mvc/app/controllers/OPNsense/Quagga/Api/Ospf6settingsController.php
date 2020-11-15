@@ -4,7 +4,7 @@
  *    Copyright (C) 2015-2017 Deciso B.V.
  *    Copyright (C) 2015 Jos Schellevis
  *    Copyright (C) 2017 Fabian Franz
- *    Copyright (C) 2017 Michael Muenz
+ *    Copyright (C) 2017 Michael Muenz <m.muenz@gmail.com>
  *    All rights reserved.
  *
  *    Redistribution and use in source and binary forms, with or without
@@ -31,15 +31,15 @@
 
 namespace OPNsense\Quagga\Api;
 
-use \OPNsense\Quagga\OSPF6;
-use \OPNsense\Core\Config;
-use \OPNsense\Base\ApiMutableModelControllerBase;
-use \OPNsense\Base\UIModelGrid;
+use OPNsense\Quagga\OSPF6;
+use OPNsense\Core\Config;
+use OPNsense\Base\ApiMutableModelControllerBase;
+use OPNsense\Base\UIModelGrid;
 
 class Ospf6settingsController extends ApiMutableModelControllerBase
 {
-    static protected $internalModelName = 'ospf6';
-    static protected $internalModelClass = '\OPNsense\Quagga\OSPF6';
+    protected static $internalModelName = 'ospf6';
+    protected static $internalModelClass = '\OPNsense\Quagga\OSPF6';
     public function searchInterfaceAction()
     {
         return $this->searchBase('interfaces.interface', array("enabled", "interfacename", "area", "networktype"));

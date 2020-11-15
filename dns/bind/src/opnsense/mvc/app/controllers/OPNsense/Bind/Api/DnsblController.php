@@ -1,7 +1,7 @@
 <?php
 
 /**
- *    Copyright (C) 2018 Michael Muenz
+ *    Copyright (C) 2018 Michael Muenz <m.muenz@gmail.com>
  *
  *    All rights reserved.
  *
@@ -34,6 +34,6 @@ use OPNsense\Base\ApiMutableModelControllerBase;
 
 class DnsblController extends ApiMutableModelControllerBase
 {
-    static protected $internalModelClass = '\OPNsense\Bind\Dnsbl';
-    static protected $internalModelName = 'dnsbl';
+    protected static $internalModelClass = '\OPNsense\Bind\Dnsbl';
+    protected static $internalModelName = 'dnsbl';
 }

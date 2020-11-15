@@ -1,6 +1,7 @@
 <?php
+
 /**
- *    Copyright (C) 2015 Deciso B.V.
+ *    Copyright (C) 2015-2019 Deciso B.V.
  *
  *    All rights reserved.
  *
@@ -26,21 +27,24 @@
  *    POSSIBILITY OF SUCH DAMAGE.
  *
  */
+
 namespace OPNsense\HelloWorld\Api;
 
-use \OPNsense\Base\ApiControllerBase;
-use \OPNsense\HelloWorld\HelloWorld;
-use \OPNsense\Core\Config;
+use OPNsense\Base\ApiControllerBase;
+use OPNsense\HelloWorld\HelloWorld;
+use OPNsense\Core\Config;
 
 /**
  * Class SettingsController Handles settings related API actions for the HelloWorld module
- * @package OPNsense\Cron
+ * @package OPNsense\Helloworld
  */
 class SettingsController extends ApiControllerBase
 {
     /**
      * retrieve HelloWorld general settings
      * @return array general settings
+     * @throws \OPNsense\Base\ModelException
+     * @throws \ReflectionException
      */
     public function getAction()
     {
@@ -56,10 +60,12 @@ class SettingsController extends ApiControllerBase
     /**
      * update HelloWorld settings
      * @return array status
+     * @throws \OPNsense\Base\ModelException
+     * @throws \ReflectionException
      */
     public function setAction()
     {
-        $result = array("result"=>"failed");
+        $result = array("result" => "failed");
         if ($this->request->isPost()) {
             // load model and update with provided data
             $mdlHelloWorld = new HelloWorld();
@@ -71,7 +77,7 @@ class SettingsController extends ApiControllerBase
                 if (!array_key_exists("validations", $result)) {
                     $result["validations"] = array();
                 }
-                $result["validations"]["helloworld.".$msg->getField()] = $msg->getMessage();
+                $result["validations"]["helloworld." . $msg->getField()] = $msg->getMessage();
             }
 
             // serialize model to config and save

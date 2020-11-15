@@ -1,34 +1,33 @@
 <?php
 
 /*
-    Copyright (C) 2014-2015 Deciso B.V.
-    Copyright (C) 2008 Ermal Luçi
-    All rights reserved.
-
-    Redistribution and use in source and binary forms, with or without
-    modification, are permitted provided that the following conditions are met:
-
-    1. Redistributions of source code must retain the above copyright notice,
-       this list of conditions and the following disclaimer.
-
-    2. Redistributions in binary form must reproduce the above copyright
-       notice, this list of conditions and the following disclaimer in the
-       documentation and/or other materials provided with the distribution.
-
-    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
-    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-    POSSIBILITY OF SUCH DAMAGE.
-*/
+ * Copyright (C) 2014-2015 Deciso B.V.
+ * Copyright (C) 2008 Ermal Luçi
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+ * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+ * AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ * AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+ * OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
 
 require_once("guiconfig.inc");
-require_once("services.inc") ;
 require_once("interfaces.inc");
 require_once("system.inc");
 require_once("plugins.inc.d/dyndns.inc");
@@ -38,7 +37,7 @@ function is_dyndns_username($uname)
 {
     if (!is_string($uname)) {
         return false;
-    } elseif (preg_match("/[^a-z0-9\-.@_:]/i", $uname)) {
+    } elseif (preg_match("/[^a-z0-9\-.@_:+]/i", $uname)) {
         return false;
     } else {
         return true;
@@ -51,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     if (isset($_GET['id']) && !empty($a_dyndns[$_GET['id']])) {
         $id = $_GET['id'];
     }
-    $config_copy_fieldnames = array('username', 'password', 'host', 'mx', 'type', 'zoneid', 'ttl', 'updateurl',
+    $config_copy_fieldnames = array('username', 'password', 'host', 'mx', 'type', 'zoneid','resourceid', 'ttl', 'updateurl',
                                     'resultmatch', 'requestif', 'descr', 'interface');
     foreach ($config_copy_fieldnames as $fieldname) {
         if (isset($id) && isset($a_dyndns[$id][$fieldname])) {
@@ -76,7 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     }
     $input_errors = array();
     $pconfig = $_POST;
-    if(($pconfig['type'] == "freedns" || $pconfig['type'] == "namecheap") && $pconfig['username'] == "") {
+    if(($pconfig['type'] == "freedns" || $pconfig['type'] == "linode" || $pconfig['type'] == "linode-v6" || $pconfig['type'] == "namecheap" || $pconfig['type'] == "cloudflare-token" || $pconfig['type'] == "cloudflare-token-v6") && $pconfig['username'] == "") {
         $pconfig['username'] = "none";
     }
 
@@ -85,12 +84,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $reqdfieldsn = array();
     $reqdfields = array('type');
     $reqdfieldsn = array(gettext('Service type'));
-    if ($pconfig['type'] != 'custom' && $pconfig['type'] != 'custom-v6') {
+
+    if (in_array($pconfig['type'], array('azure', 'azurev6'))) {
+        $reqdfields[] = 'password';
+        $reqdfieldsn[] = gettext('Password');
+        $reqdfields[] = 'resourceid';
+        $reqdfieldsn[] = gettext('Resource Id');
+        $reqdfields[] = 'ttl';
+        $reqdfieldsn[] = gettext('TTL');
+    } elseif ($pconfig['type'] != 'custom' && $pconfig['type'] != 'custom-v6') {
         $reqdfields[] = 'host';
         $reqdfieldsn[] = gettext('Hostname');
         $reqdfields[] = 'username';
         $reqdfieldsn[] = gettext('Username');
-        if (!in_array($pconfig['type'], array('duckdns', 'regfish', 'regfish-v6'))) {
+        if (!in_array($pconfig['type'], array('dynv6', 'dynv6-v6', 'duckdns', 'regfish', 'regfish-v6'))) {
             $reqdfields[] = 'password';
             $reqdfieldsn[] = gettext('Password');
         }
@@ -102,11 +109,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     do_input_validation($pconfig, $reqdfields, $reqdfieldsn, $input_errors);
 
     if (isset($pconfig['host']) && in_array('host', $reqdfields)) {
-        /* Namecheap can have a @. in hostname */
-        if ($pconfig['type'] == "namecheap" && substr($pconfig['host'], 0, 2) == '@.') {
-            $host_to_check = substr($pconfig['host'], 2);
-        } else {
-            $host_to_check = $pconfig['host'];
+        $host_to_check = $pconfig['host'];
+
+        switch ($pconfig['type']) {
+            case 'cloudflare':
+            case 'cloudflare-v6':
+            case 'cloudflare-token':
+            case 'cloudflare-token-v6':
+            case 'eurodns':
+            case 'godaddy':
+            case 'godaddy-v6':
+            case 'googledomains':
+            case 'linode':
+            case 'linode-v6':
+            case 'namecheap':
+                $host_to_check = preg_replace('/^[@*]\./', '', $host_to_check);
+                break;
+            default:
+                break;
         }
 
         if (!is_domain($host_to_check)) {
@@ -121,6 +141,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $input_errors[] = gettext("The username contains invalid characters.");
     }
 
+    if (!empty($pconfig['ttl']) && (string)((int)$pconfig['ttl']) != $pconfig['ttl']) {
+        $input_errors[] = gettext("The TTL value needs to be a valid integer number.");
+    }
 
     if (count($input_errors) == 0) {
         $dyndns = array();
@@ -136,6 +159,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $dyndns['enable'] = !empty($pconfig['enable']);
         $dyndns['interface'] = $pconfig['interface'];
         $dyndns['zoneid'] = $pconfig['zoneid'];
+        $dyndns['resourceid'] = $pconfig['resourceid'];
         $dyndns['ttl'] = $pconfig['ttl'];
         $dyndns['updateurl'] = $pconfig['updateurl'];
         // Trim hard-to-type but sometimes returned characters
@@ -190,6 +214,19 @@ include("head.inc");
               case "route53":
               case "route53-v6":
                 $(".type_route53").show();
+                break;
+              case "azure":
+              case "azurev6":
+                $(".type_azure").show();
+                break;
+              case 'cloudflare':
+              case 'cloudflare-v6':
+                $(".type_default").show();
+                $(".type_cloudflare").show();
+                break;
+              case 'cloudflare-token':
+              case 'cloudflare-token-v6':
+                $(".type_cloudflare").show();
                 break;
               default:
                 $(".type_default").show();
@@ -280,7 +317,8 @@ include("head.inc");
                       <input name="host" type="text" id="host" value="<?= $pconfig['host'] ?>" />
                       <div class="hidden" data-for="help_for_host">
                         <?= gettext("Enter the complete host/domain name. example: myhost.dyndns.org") ?><br />
-                        <?= gettext("For he.net tunnelbroker, enter your tunnel ID") ?>
+                        <?= gettext("For he.net tunnelbroker, enter your tunnel ID") ?><br />
+                        <?= gettext('Gandi LiveDNS: Enter the 2nd-level domain ("example.org").') ?>
                       </div>
                     </td>
                   </tr>
@@ -318,15 +356,19 @@ include("head.inc");
                       <?= gettext("Verify SSL peer") ?>
                     </td>
                   </tr>
-                  <tr>
+                  <tr class ="opt_field type_custom type_route53 type_azure type_default">
                     <td><a id="help_for_username" href="#" class="showhelp"><i class="fa fa-info-circle"></i></a> <?= gettext("Username") ?></td>
                     <td>
                       <input name="username" type="text" id="username" value="<?= $pconfig['username'] ?>" />
                       <div class="hidden" data-for="help_for_username">
-                        <?= gettext("Username is required for all types except Namecheap, FreeDNS and Custom Entries.");?>
+                        <?= gettext('Username is required except when stated otherwise.') ?>
                         <br /><?= gettext('Route 53: Enter your Access Key ID.') ?>
                         <br /><?= gettext('Duck DNS: Enter your Token.') ?>
+                        <br /><?= gettext('dynv6: Enter your Token.') ?>
+                        <br /><?= gettext('Azure: Enter your Azure AD application ID.') ?>
                         <br /><?= gettext('For Custom Entries, Username and Password represent HTTP Authentication username and passwords.') ?>
+                        <br /><?= gettext('Gandi LiveDNS: The subdomain / record to update.') ?>
+                        <br /><?= gettext('GoDaddy: Enter your API Key Token.') ?>
                       </div>
                     </td>
                   </tr>
@@ -338,6 +380,12 @@ include("head.inc");
                         <?=gettext('FreeDNS (freedns.afraid.org): Enter your "Authentication Token" provided by FreeDNS.') ?>
                         <br /><?= gettext('Route 53: Enter your Secret Access Key.') ?>
                         <br /><?= gettext('Duck DNS: Leave blank.') ?>
+                        <br /><?= gettext('dynv6: Leave blank.') ?>
+                        <br /><?= gettext('Azure: client secret of the AD application') ?>
+                        <br /><?= gettext('Linode: Enter your Personal Access Token.') ?>
+                        <br /><?= gettext('Cloudflare: Enter your API token or Global API key.') ?>
+                        <br /><?= gettext('Gandi LiveDNS: Enter your API token.') ?>
+                        <br /><?= gettext('GoDaddy: Enter your API Secret Token.') ?>
                       </div>
                     </td>
                   </tr>
@@ -347,6 +395,15 @@ include("head.inc");
                       <input name="zoneid" type="text" id="zoneid" value="<?= $pconfig['zoneid'] ?>" />
                       <div class="hidden" data-for="help_for_zoneid">
                         <?= gettext("Enter Zone ID that you received when you created your domain in Route 53.") ?>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr class="opt_field type_azure">
+                    <td><a id="help_for_resourceid" href="#" class="showhelp"><i class="fa fa-info-circle"></i></a> <?= gettext('Resource Id') ?></td>
+                    <td>
+                      <input name="resourceid" type="text" id="resourceid" value="<?= $pconfig['resourceid'] ?>" />
+                      <div class="hidden" data-for="help_for_resourceid">
+                        <?= gettext("Enter the resource id of the DNS Zone in Azure.") ?>
                       </div>
                     </td>
                   </tr>
@@ -378,12 +435,13 @@ include("head.inc");
                       </div>
                     </td>
                   </tr>
-                  <tr class="opt_field type_route53">
+                  <tr class="opt_field type_route53 type_azure type_cloudflare">
                     <td><a id="help_for_ttl" href="#" class="showhelp"><i class="fa fa-info-circle"></i></a> <?=gettext("TTL");?></td>
                     <td>
                       <input name="ttl" type="text" id="ttl" value="<?= $pconfig['ttl'] ?>" />
                       <div class="hidden" data-for="help_for_ttl">
                         <?= gettext("Choose TTL for your dns record.") ?>
+                        <br /><?= gettext('Cloudflare: value "1" means "Auto". Anything below 1 will be updated with value 1/Auto.') ?>
                       </div>
                     </td>
                   </tr>
@@ -397,12 +455,10 @@ include("head.inc");
                     <td>&nbsp;</td>
                     <td>
                       <button name="submit" type="submit" class="btn btn-primary" value="save"><?= gettext('Save') ?></button>
-<?php
-                      if (isset($id)): ?>
+<?php if (isset($id)): ?>
                         <button name="force" type="submit" class="btn btn-primary" value="force"><?= gettext('Save and Force Update') ?></button>
                         <input name="id" type="hidden" value="<?= $id ?>" />
-<?php
-                      endif; ?>
+<?php endif ?>
                       <a href="services_dyndns.php" class="btn btn-default"><?= gettext('Cancel') ?></a>
                     </td>
                   </tr>
@@ -422,4 +478,6 @@ include("head.inc");
       </div>
     </div>
   </section>
-<?php include("foot.inc"); ?>
+<?php
+
+include("foot.inc");

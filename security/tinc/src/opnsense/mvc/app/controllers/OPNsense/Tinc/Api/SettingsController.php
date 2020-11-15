@@ -1,4 +1,5 @@
 <?php
+
 /**
  *    Copyright (C) 2016 Deciso B.V.
  *
@@ -26,11 +27,12 @@
  *    POSSIBILITY OF SUCH DAMAGE.
  *
  */
+
 namespace OPNsense\Tinc\Api;
 
-use \OPNsense\Base\ApiMutableModelControllerBase;
-use \OPNsense\Base\UIModelGrid;
-use \OPNsense\Core\Backend;
+use OPNsense\Base\ApiMutableModelControllerBase;
+use OPNsense\Base\UIModelGrid;
+use OPNsense\Core\Backend;
 
 /**
  * Class SettingsController Handles settings related API actions for Tinc VPN
@@ -38,8 +40,8 @@ use \OPNsense\Core\Backend;
  */
 class SettingsController extends ApiMutableModelControllerBase
 {
-    static protected $internalModelName = 'tinc';
-    static protected $internalModelClass = '\OPNsense\Tinc\Tinc';
+    protected static $internalModelName = 'tinc';
+    protected static $internalModelClass = '\OPNsense\Tinc\Tinc';
 
     /**
      * get network action
@@ -53,7 +55,7 @@ class SettingsController extends ApiMutableModelControllerBase
             $node = $this->getModel()->networks->network->Add();
             return array("network" => $node->getNodes());
         } else {
-            $node = $this->getModel()->getNodeByReference('networks.network.'.$uuid);
+            $node = $this->getModel()->getNodeByReference('networks.network.' . $uuid);
             if ($node != null) {
                 // return node
                 return array("network" => $node->getNodes());
@@ -71,7 +73,7 @@ class SettingsController extends ApiMutableModelControllerBase
     {
         if ($this->request->isPost() && $this->request->hasPost("network")) {
             if ($uuid != null) {
-                $node = $this->getModel()->getNodeByReference('networks.network.'.$uuid);
+                $node = $this->getModel()->getNodeByReference('networks.network.' . $uuid);
             } else {
                 $node = $this->getModel()->networks->network->Add();
             }
@@ -85,7 +87,7 @@ class SettingsController extends ApiMutableModelControllerBase
             }
             return $this->validateAndSave($node, 'network');
         }
-        return array("result"=>"failed");
+        return array("result" => "failed");
     }
 
 
@@ -160,7 +162,7 @@ class SettingsController extends ApiMutableModelControllerBase
             $node = $this->getModel()->hosts->host->Add();
             return array("host" => $node->getNodes());
         } else {
-            $node = $this->getModel()->getNodeByReference('hosts.host.'.$uuid);
+            $node = $this->getModel()->getNodeByReference('hosts.host.' . $uuid);
             if ($node != null) {
                 // return node
                 return array("host" => $node->getNodes());
@@ -178,14 +180,14 @@ class SettingsController extends ApiMutableModelControllerBase
     {
         if ($this->request->isPost() && $this->request->hasPost("host")) {
             if ($uuid != null) {
-                $node = $this->getModel()->getNodeByReference('hosts.host.'.$uuid);
+                $node = $this->getModel()->getNodeByReference('hosts.host.' . $uuid);
             } else {
                 $node = $this->getModel()->hosts->host->Add();
             }
             $node->setNodes($this->request->getPost("host"));
             return $this->validateAndSave($node, 'host');
         }
-        return array("result"=>"failed");
+        return array("result" => "failed");
     }
 
 

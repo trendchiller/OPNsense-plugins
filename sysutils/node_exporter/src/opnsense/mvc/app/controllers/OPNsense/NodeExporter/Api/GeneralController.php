@@ -28,10 +28,10 @@
 
 namespace OPNsense\NodeExporter\Api;
 
-use \OPNsense\Base\ApiMutableModelControllerBase;
+use OPNsense\Base\ApiMutableModelControllerBase;
 
 class GeneralController extends ApiMutableModelControllerBase
 {
-    static protected $internalModelName = 'general';
-    static protected $internalModelClass = 'OPNsense\NodeExporter\General';
+    protected static $internalModelName = 'general';
+    protected static $internalModelClass = 'OPNsense\NodeExporter\General';
 }

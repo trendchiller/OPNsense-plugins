@@ -1,4 +1,5 @@
 <?php
+
 /**
  *    Copyright (C) 2016 Frank Wall
  *    Copyright (C) 2015 Deciso B.V.
@@ -27,11 +28,12 @@
  *    POSSIBILITY OF SUCH DAMAGE.
  *
  */
+
 namespace OPNsense\HAProxy\Api;
 
-use \OPNsense\Base\ApiControllerBase;
-use \OPNsense\Core\Backend;
-use \OPNsense\HAProxy\HAProxy;
+use OPNsense\Base\ApiControllerBase;
+use OPNsense\Core\Backend;
+use OPNsense\HAProxy\HAProxy;
 
 /**
  * Class StatisticsController

@@ -1,79 +1,74 @@
 <?php
 
 /*
-	Copyright (C) 2014 Deciso B.V.
-	Copyright 2012 mkirbst @ pfSense Forum
-	All rights reserved.
+ * Copyright (C) 2018 Smart-Soft
+ * Copyright (C) 2014 Deciso B.V.
+ * Copyright 2012 mkirbst @ pfSense Forum
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+ * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+ * AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ * AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+ * OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
 
-	Redistribution and use in source and binary forms, with or without
-	modification, are permitted provided that the following conditions are met:
+require_once('guiconfig.inc');
+require_once('widgets/include/smart_status.inc');
 
-	1. Redistributions of source code must retain the above copyright notice,
-	   this list of conditions and the following disclaimer.
-
-	2. Redistributions in binary form must reproduce the above copyright
-	   notice, this list of conditions and the following disclaimer in the
-	   documentation and/or other materials provided with the distribution.
-
-	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
-	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-	POSSIBILITY OF SUCH DAMAGE.
-*/
-
-require_once("guiconfig.inc");
-require_once("widgets/include/smart_status.inc");
+$devs = json_decode(configd_run('smart detailed list'));
 
 ?>
 
-<table class="table table-striped" style="width:100%; border:0; cellpadding:0; cellspacing:0">
-	<tr>
-		<td class="widgetsubheader" style="text-align:center"><b><?php echo gettext("Drive") ?></b></td>
-		<td class="widgetsubheader" style="text-align:center"><b><?php echo gettext("Ident") ?></b></td>
-		<td class="widgetsubheader" style="text-align:center"><b><?php echo gettext("SMART Status") ?></b></td>
-	</tr>
+<table class="table table-striped table-condensed">
+  <thead>
+    <tr>
+        <th><?= gettext('Drive') ?></td>
+        <th><?= gettext('Ident') ?></td>
+        <th><?= gettext('Status') ?></td>
+    </tr>
+  </thead>
+  <tbody>
 
-<?php
-$devs = array();
-## Get all adX, daX, and adaX (IDE, SCSI, and AHCI) devices currently installed
-exec("ls /dev | grep '^\(ad\|da\|ada\)[0-9]\{1,2\}$'", $devs); ## From SMART status page
+<?php foreach ($devs as $dev):
 
-if (count($devs) > 0) {
-    foreach ($devs as $dev) {
-## for each found drive do
-        $dev_ident = exec("diskinfo -v /dev/$dev | grep ident   | awk '{print $1}'"); ## get identifier from drive
-        $dev_state = trim(exec("smartctl -H /dev/$dev | awk -F: '/^SMART overall-health self-assessment test result/ {print $2;exit}
-/^SMART Health Status/ {print $2;exit}'")); ## get SMART state from drive
-        $dev_state_translated = "";
-        switch ($dev_state) {
-            case "PASSED":
-            case "OK":
-                $dev_state_translated = gettext('OK');
-                $color = "#90EE90";
-                break;
-            case "":
-              $dev_state = "Unknown";
-              $dev_state_translated = gettext('Unknown');
-                $color = "#C0B788";
-                break;
-            default:
-                $color = "#F08080";
-                break;
-        }
-?>
-		<tr>
-			<td class="listlr"><?php echo $dev; ?></td>
-			<td class="listr" style="text-align:center"><?php echo $dev_ident; ?></td>
-			<td class="listr" style="text-align:center"><span style="background-color:<?php echo $color; ?>">&nbsp;<?php echo $dev_state_translated ?>&nbsp;</span></td>
-		</tr>
-<?php
+    $dev_state_translated = gettext('Unknown');
+    $color = 'default';
+
+    if (isset($dev->state->smart_status->passed)) {
+        if ($dev->state->smart_status->passed) {
+            $dev_state_translated = gettext('OK');
+            $color = 'success';
+        } else {
+            $dev_state_translated = gettext('FAILED');
+            $color = 'danger';
+	}
     }
-}
+
 ?>
+
+    <tr>
+      <td><?= html_safe($dev->device) ?></td>
+      <td><?= html_safe($dev->ident) ?></td>
+      <td><span class="label label-<?= $color ?>"><?= html_safe($dev_state_translated) ?></span></td>
+    </tr>
+
+<?php endforeach ?>
+
+  </tbody>
 </table>

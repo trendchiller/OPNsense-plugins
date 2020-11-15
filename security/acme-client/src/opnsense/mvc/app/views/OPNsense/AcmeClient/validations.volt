@@ -38,7 +38,7 @@ POSSIBILITY OF SUCH DAMAGE.
         $("#grid-validations").UIBootgrid(
             {   search:'/api/acmeclient/validations/search',
                 get:'/api/acmeclient/validations/get/',
-                set:'/api/acmeclient/validations/set/',
+                set:'/api/acmeclient/validations/update/',
                 add:'/api/acmeclient/validations/add/',
                 del:'/api/acmeclient/validations/del/',
                 toggle:'/api/acmeclient/validations/toggle/',
@@ -56,6 +56,18 @@ POSSIBILITY OF SUCH DAMAGE.
                 if ($("#validation\\.method").val() == 'dns01') {
                     $("."+service_id).show();
                 }
+                // Show a warning if the Google Cloud SDK plugin is missing.
+                ajaxCall(url="/api/acmeclient/settings/getGcloudPluginStatus", sendData={}, callback=function(data,status) {
+                    if (data['result'] != 0) {
+                        $(".gcloud_plugin_warning").hide();
+                    }
+                });
+                // Show a warning if the BIND plugin is missing.
+                ajaxCall(url="/api/acmeclient/settings/getBindPluginStatus", sendData={}, callback=function(data,status) {
+                    if (data['result'] != 0) {
+                        $(".bind_plugin_warning").hide();
+                    }
+                });
             });
             $("#validation\\.http_service").change(function(){
                 var service_id = 'table_http_' + $(this).val();
@@ -72,13 +84,14 @@ POSSIBILITY OF SUCH DAMAGE.
                 $("#validation\\.http_service").change();
             });
             $("#validation\\.method").change();
+
         })
     });
 
 </script>
 
 <ul class="nav nav-tabs" data-tabs="tabs" id="maintabs">
-    <li class="active"><a data-toggle="tab" href="#validations">{{ lang._('Validation Methods') }}</a></li>
+    <li class="active"><a data-toggle="tab" href="#validations">{{ lang._('Challenge Types') }}</a></li>
 </ul>
 
 <div class="tab-content content-box tab-content">
@@ -109,4 +122,4 @@ POSSIBILITY OF SUCH DAMAGE.
 </div>
 
 {# include dialogs #}
-{{ partial("layout_partials/base_dialog",['fields':formDialogValidation,'id':'DialogValidation','label':lang._('Edit Validation Method')])}}
+{{ partial("layout_partials/base_dialog",['fields':formDialogValidation,'id':'DialogValidation','label':lang._('Edit Challenge Type')])}}

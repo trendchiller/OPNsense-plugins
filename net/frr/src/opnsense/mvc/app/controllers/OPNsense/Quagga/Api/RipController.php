@@ -1,4 +1,5 @@
 <?php
+
 /**
  *    Copyright (C) 2017 Fabian Franz
  *
@@ -29,10 +30,10 @@
 
 namespace OPNsense\Quagga\Api;
 
-use \OPNsense\Base\ApiMutableModelControllerBase;
+use OPNsense\Base\ApiMutableModelControllerBase;
 
 class RipController extends ApiMutableModelControllerBase
 {
-    static protected $internalModelName = 'rip';
-    static protected $internalModelClass = '\OPNsense\Quagga\RIP';
+    protected static $internalModelName = 'rip';
+    protected static $internalModelClass = '\OPNsense\Quagga\RIP';
 }

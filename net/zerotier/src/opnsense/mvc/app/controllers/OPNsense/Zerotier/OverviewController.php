@@ -1,4 +1,5 @@
 <?php
+
 /**
  *    Copyright (C) 2017 David Harrigan
  *    Copyright (C) 2017 Deciso B.V.
@@ -27,11 +28,12 @@
  *    POSSIBILITY OF SUCH DAMAGE.
  *
  */
+
 namespace OPNsense\Zerotier;
 
 require_once 'plugins.inc.d/zerotier.inc';
 
-use \OPNsense\Core\Backend;
+use OPNsense\Core\Backend;
 
 class OverviewController extends \OPNsense\Base\IndexController
 {

@@ -1,7 +1,7 @@
-#!/usr/local/bin/python2.7
+#!/usr/local/bin/python3
 
 """
-    Copyright (c) 2016 Ad Schellevis
+    Copyright (c) 2016-2019 Ad Schellevis <ad@opnsense.org>
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -35,6 +35,7 @@ import glob
 import pipes
 import xml.etree.ElementTree
 import subprocess
+import ipaddress
 from lib import objects
 
 def write_file(filename, content, mode=0o600):
@@ -59,7 +60,7 @@ def read_config(config_filename):
     return result
 
 def deploy(config_filename):
-    interfaces = (subprocess.check_output(['/sbin/ifconfig','-l'])).split()
+    interfaces = subprocess.run(['/sbin/ifconfig','-l'], capture_output=True, text=True).stdout.split()
     networks = read_config(config_filename)
     # remove previous configuration
     os.system('rm -rf /usr/local/etc/tinc')
@@ -80,18 +81,27 @@ def deploy(config_filename):
         # dump private key
         tmp = network.privkey()
         write_file(tmp['filename'], tmp['content'])
+        with open('/etc/resolv.conf') as fin:
+            write_file("%s/etc/resolv.conf" % network.get_basepath(), fin.read())
 
         # write tinc-up file
+        interface_address = network.get_local_address()
+        interface_network = ipaddress.ip_network(interface_address, False)
+        interface_family = "inet6" if interface_network.version == 6 else "inet"
+        interface_configd = "newipv6" if interface_network.version == 6 else "newip"
+
         if_up = list()
         if_up.append("#!/bin/sh")
-        if_up.append("ifconfig %s %s " % (interface_name, pipes.quote(network.get_local_address())))
+        if_up.append("ifconfig %s %s %s" % (interface_name, interface_family, pipes.quote(interface_address)))
+        if_up.append("configctl interface %s %s" % (interface_configd, interface_name))
         write_file("%s/tinc-up" % network.get_basepath(), '\n'.join(if_up) + "\n", 0o700)
 
         # configure and rename new tun device, place all in group "tinc" symlink associated tun device
         if interface_name not in interfaces:
-            tundev = subprocess.check_output(['/sbin/ifconfig',interface_type,'create']).split()[0]
-            subprocess.call(['/sbin/ifconfig',tundev,'name',interface_name])
-            subprocess.call(['/sbin/ifconfig',interface_name,'group','tinc'])
+            tundev = subprocess.run(['/sbin/ifconfig', interface_type, 'create'],
+                                    capture_output=True, text=True).stdout.split()[0]
+            subprocess.run(['/sbin/ifconfig',tundev,'name',interface_name])
+            subprocess.run(['/sbin/ifconfig',interface_name,'group','tinc'])
             if os.path.islink('/dev/%s' % interface_name):
                 os.remove('/dev/%s' % interface_name)
             os.symlink('/dev/%s' % tundev, '/dev/%s' % interface_name)
@@ -100,7 +110,11 @@ def deploy(config_filename):
 if len(sys.argv) > 1:
     if sys.argv[1] == 'stop':
         for instance in glob.glob('/usr/local/etc/tinc/*'):
-            subprocess.call(['/usr/local/sbin/tincd','-n',instance.split('/')[-1], '-k'])
+            subprocess.run(['/usr/local/sbin/tincd','-n',instance.split('/')[-1], '-k'])
+            if os.path.exists('%s/tinc.conf' % instance):
+                interface_name  = open('%s/tinc.conf' % instance).read().split('Device=')[-1].split()[0].split('/')[-1]
+                if interface_name.startswith('tinc'):
+                    subprocess.run(['/sbin/ifconfig',interface_name,'destroy'])
     elif sys.argv[1] == 'start':
         for netwrk in deploy('/usr/local/etc/tinc_deploy.xml'):
-            subprocess.call(['/usr/local/sbin/tincd','-n',netwrk.get_network(), '-R', '-d', netwrk.get_debuglevel()])
+            subprocess.run(['/usr/local/sbin/tincd','-n',netwrk.get_network(), '-R', '-d', netwrk.get_debuglevel()])

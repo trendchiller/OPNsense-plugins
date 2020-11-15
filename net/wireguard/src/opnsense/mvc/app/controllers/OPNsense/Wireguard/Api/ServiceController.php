@@ -1,7 +1,7 @@
 <?php
 
 /**
- *    Copyright (C) 2018 Michael Muenz
+ *    Copyright (C) 2018 Michael Muenz <m.muenz@gmail.com>
  *
  *    All rights reserved.
  *
@@ -40,8 +40,30 @@ use OPNsense\Wireguard\General;
  */
 class ServiceController extends ApiMutableServiceControllerBase
 {
-    static protected $internalServiceClass = '\OPNsense\Wireguard\General';
-    static protected $internalServiceTemplate = 'OPNsense/Wireguard';
-    static protected $internalServiceEnabled = 'enabled';
-    static protected $internalServiceName = 'wireguard';
+    protected static $internalServiceClass = '\OPNsense\Wireguard\General';
+    protected static $internalServiceTemplate = 'OPNsense/Wireguard';
+    protected static $internalServiceEnabled = 'enabled';
+    protected static $internalServiceName = 'wireguard';
+
+    /**
+     * show wireguard config
+     * @return array
+     */
+    public function showconfAction()
+    {
+        $backend = new Backend();
+        $response = $backend->configdRun("wireguard showconf");
+        return array("response" => $response);
+    }
+
+    /**
+     * show wireguard handshakes
+     * @return array
+     */
+    public function showhandshakeAction()
+    {
+        $backend = new Backend();
+        $response = $backend->configdRun("wireguard showhandshake");
+        return array("response" => $response);
+    }
 }

@@ -1,7 +1,7 @@
 <?php
 
 /*
-    Copyright (C) 2018 Michael Muenz
+    Copyright (C) 2018 Michael Muenz <m.muenz@gmail.com>
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -60,11 +60,11 @@ function wireguard_interfaces()
         return $interfaces;
     }
     $oic = array('enable' => true);
-    $oic['if'] = 'wg';
+    $oic['if'] = 'wireguard';
     $oic['descr'] = 'WireGuard';
     $oic['type'] = 'group';
     $oic['virtual'] = true;
     $oic['networks'] = array();
-    $interfaces['wg'] = $oic;
+    $interfaces['wireguard'] = $oic;
     return $interfaces;
 }

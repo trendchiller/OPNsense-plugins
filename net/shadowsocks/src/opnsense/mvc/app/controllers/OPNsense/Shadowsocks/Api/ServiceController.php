@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (C) 2018 Michael Muenz
+ * Copyright (C) 2018 Michael Muenz <m.muenz@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,8 +32,8 @@ use OPNsense\Base\ApiMutableServiceControllerBase;
 
 class ServiceController extends ApiMutableServiceControllerBase
 {
-    static protected $internalServiceClass = '\OPNsense\Shadowsocks\General';
-    static protected $internalServiceTemplate = 'OPNsense/Shadowsocks';
-    static protected $internalServiceEnabled = 'enabled';
-    static protected $internalServiceName = 'shadowsocks';
+    protected static $internalServiceClass = '\OPNsense\Shadowsocks\General';
+    protected static $internalServiceTemplate = 'OPNsense/Shadowsocks';
+    protected static $internalServiceEnabled = 'enabled';
+    protected static $internalServiceName = 'shadowsocks';
 }
