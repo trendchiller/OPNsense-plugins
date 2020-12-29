@@ -32,19 +32,14 @@ use OPNsense\AcmeClient\LeValidationInterface;
 use OPNsense\Core\Config;
 
 /**
- * Lexicon DNS API
+ * deSEC API
  * @package OPNsense\AcmeClient
  */
-class DnsLexicon extends Base implements LeValidationInterface
+class DnsDesec extends Base implements LeValidationInterface
 {
     public function prepare()
     {
-        $provider = (string)$this->config->dns_lexicon_provider;
-        $env_user = 'LEXICON_' . strtoupper($provider) . '_USERNAME';
-        $env_token = 'LEXICON_' . strtoupper($provider) . '_TOKEN';
-
-        $this->acme_env['PROVIDER'] = $provider;
-        $this->acme_env[$env_user] = (string)$this->config->dns_lexicon_user;
-        $this->acme_env[$env_token] = (string)$this->config->dns_lexicon_token;
+        $this->acme_env['DEDYN_TOKEN'] = (string)$this->config->dns_desec_token;
+        $this->acme_env['DEDYN_NAME'] = (string)$this->config->dns_desec_name;
     }
 }
